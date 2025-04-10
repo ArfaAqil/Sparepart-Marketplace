@@ -1,0 +1,478 @@
+:root {
+  --primary: #4361ee;
+  --primary-light: #4895ef;
+  --primary-dark: #3a56d4;
+  --secondary: #4cc9f0;
+  --accent: #f72585;
+  --background: #f8f9fa;
+  --surface: #ffffff;
+  --error: #ef233c;
+  --success: #4bb543;
+  --text-primary: #2b2d42;
+  --text-secondary: #6c757d;
+  --text-on-primary: #ffffff;
+  --border: #e9ecef;
+  --border-radius: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+  --transition: all 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header Styles */
+.dashboard-header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--text-on-primary);
+  padding: 15px 0;
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.dashboard-header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.user-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.username {
+  font-weight: 500;
+}
+
+.logout-btn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logout-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Main Content */
+.dashboard-main {
+  padding: 30px 0;
+}
+
+.dashboard-toolbar {
+  margin-bottom: 30px;
+}
+
+.dashboard-toolbar h1 {
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
+
+.search-filter-container {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  flex: 1;
+  display: flex;
+  position: relative;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 20px;
+  padding-right: 50px;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.search-box input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+  outline: none;
+}
+
+.search-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 50px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.search-btn:hover {
+  color: var(--primary);
+}
+
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.filter-toggle:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Filter Sidebar */
+.filter-sidebar {
+  position: fixed;
+  top: 0;
+  right: -350px;
+  width: 350px;
+  height: 100vh;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  padding: 20px;
+  z-index: 1001;
+  transition: var(--transition);
+  overflow-y: auto;
+}
+
+.filter-sidebar.active {
+  right: 0;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border);
+}
+
+.filter-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.close-filter {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.close-filter:hover {
+  color: var(--primary);
+}
+
+.filter-search {
+  margin-bottom: 20px;
+}
+
+.filter-search input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+}
+
+.filter-group {
+  margin-bottom: 25px;
+}
+
+.filter-group h4 {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  background: white;
+}
+
+.year-range {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.year-range input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+}
+
+.price-range {
+  padding: 15px 0;
+}
+
+.price-range input[type="range"] {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.price-values {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.filter-checkbox input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--primary);
+  border-radius: 4px;
+  position: relative;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.filter-checkbox input[type="checkbox"]:checked {
+  background-color: var(--primary);
+}
+
+.filter-checkbox input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -1px;
+  left: 2px;
+  color: white;
+  font-size: 12px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.reset-filter, .apply-filter {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.reset-filter {
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.reset-filter:hover {
+  background: #f8f9fa;
+}
+
+.apply-filter {
+  background: var(--primary);
+  border: none;
+  color: white;
+}
+
+.apply-filter:hover {
+  background: var(--primary-dark);
+}
+
+/* Product Grid */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: var(--surface);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.product-image {
+  height: 200px;
+  background: #f1f3f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.product-info {
+  padding: 20px;
+}
+
+.product-title {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.product-price {
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+}
+
+.product-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.add-to-cart {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.add-to-cart:hover {
+  background: var(--primary-dark);
+}
+
+/* Footer */
+.dashboard-footer {
+  background: var(--text-primary);
+  color: white;
+  padding: 25px 0;
+  margin-top: 50px;
+}
+
+.dashboard-footer a {
+  color: white;
+  text-decoration: none;
+  margin: 0 10px;
+  transition: var(--transition);
+}
+
+.dashboard-footer a:hover {
+  color: var(--secondary);
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: var(--transition);
+}
+
+.overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .search-filter-container {
+      flex-direction: column;
+  }
+  
+  .filter-sidebar {
+      width: 300px;
+  }
+  
+  .product-grid {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header .container {
+      flex-direction: column;
+      gap: 15px;
+  }
+  
+  .user-nav {
+      width: 100%;
+      justify-content: space-between;
+  }
+  
+  .filter-sidebar {
+      width: 280px;
+  }
+}

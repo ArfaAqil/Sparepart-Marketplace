@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог | Покупатель</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="logo">АВТОЗАПЧАСТИ</div>
+            <nav class="user-nav">
+                <span class="username">Добро пожаловать, <span id="displayUsername">Покупатель</span></span>
+                <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="container">
+            <div class="dashboard-toolbar">
+                <h1>Каталог запчастей</h1>
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <input type="text" placeholder="Поиск по названию или VIN..." id="searchInput">
+                        <button class="search-btn"><i class="fas fa-search"></i></button>
+                    </div>
+                    <button class="filter-toggle" id="filterToggle">
+                        <i class="fas fa-sliders-h"></i> Фильтры
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-sidebar" id="filterSidebar">
+                <div class="filter-header">
+                    <h3><i class="fas fa-filter"></i> Фильтры</h3>
+                    <button class="close-filter">&times;</button>
+                </div>
+                
+                <div class="filter-search">
+                    <input type="text" placeholder="Поиск по названию..." id="productSearch">
+                </div>
+                
+                <div class="filter-group">
+                    <h4><i class="fas fa-car"></i> Марка</h4>
+                    <select class="filter-select" id="brandFilter">
+                        <option value="">Все марки</option>
+                        <option value="Toyota">Toyota</option>
+                        <option value="Lada">Lada</option>
+                        <option value="Honda">Honda</option>
+                        <option value="BMW">BMW</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <h4><i class="fas fa-calendar-alt"></i> Год выпуска</h4>
+                    <div class="year-range">
+                        <input type="number" id="minYear" placeholder="От" min="1990" max="2023">
+                        <span>-</span>
+                        <input type="number" id="maxYear" placeholder="До" min="1990" max="2023">
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <h4><i class="fas fa-tags"></i> Цена (₽)</h4>
+                    <div class="price-range">
+                        <input type="range" min="0" max="100000" value="50000" id="priceSlider">
+                        <div class="price-values">
+                            <span id="minPrice">0</span>
+                            <span>-</span>
+                            <span id="maxPrice">100000</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <h4><i class="fas fa-check-circle"></i> Состояние</h4>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="newCondition" checked>
+                        <label for="newCondition">Новые</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="usedCondition" checked>
+                        <label for="usedCondition">Б/У</label>
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button class="reset-filter">Сбросить</button>
+                    <button class="apply-filter">Применить</button>
+                </div>
+            </div>
+
+            <div class="product-grid" id="productGrid">
+                <!-- Product cards will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>© 2024 Автозапчасти | <a href="#">Помощь</a> | <a href="#">О нас</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
