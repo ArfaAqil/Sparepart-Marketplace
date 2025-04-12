@@ -1,0 +1,115 @@
+.order-history-main {
+    padding: 2rem 0;
+}
+
+.order-list {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.order-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.order-meta {
+    display: flex;
+    flex-direction: column;
+}
+
+.order-number {
+    font-weight: 600;
+}
+
+.order-date {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.order-status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: #4CAF50;
+    color: white;
+}
+
+.order-status.cancelled {
+    background: #F44336;
+}
+
+.order-summary {
+    margin: 1rem 0;
+}
+
+.order-total {
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.order-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.order-actions button, .order-actions a {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+}
+
+.cancel-order-btn {
+    background: #FFC107;
+    border: none;
+    color: #000;
+}
+
+.delete-order-btn {
+    background: #F44336;
+    border: none;
+    color: white;
+}
+
+.back-to-catalog-btn {
+    background: #2196F3;
+    color: white;
+}
+
+.empty-orders {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.empty-orders i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #ccc;
+}
+
+.empty-orders p {
+    margin-bottom: 1.5rem;
+}
+
+.back-btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #2196F3;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+}

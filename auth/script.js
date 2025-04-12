@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const toggleAuthMode = document.getElementById('toggleAuthMode');
     const authForm = document.getElementById('authForm');
     const authTitle = document.querySelector('.auth-title');
-    const authFormContainer = document.querySelector('.auth-form-container');
 
     // Role Selection
     roleBtns.forEach(btn => {
@@ -57,24 +56,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Save user data to localStorage
-        if (authTitle.textContent.includes('Регистрация')) {
-            const userData = {
-                username,
-                email,
-                password,
-                role
-            };
-            localStorage.setItem('userData', JSON.stringify(userData));
-            alert('Регистрация успешна!');
-        }
+        const userData = {
+            username,
+            email,
+            password,
+            role
+        };
+        localStorage.setItem('userData', JSON.stringify(userData));
         
         // Redirect to buyer dashboard
         window.location.href = '../dashboard/buyer/index.html';
     });
-
-    // Check if coming from registration
-    if (localStorage.getItem('userData')) {
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        document.getElementById('email').value = userData.email;
-    }
 });
