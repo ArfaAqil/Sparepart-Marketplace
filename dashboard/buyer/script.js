@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // DOM Elements
     const filterToggle = document.getElementById('filterToggle');
     const filterSidebar = document.getElementById('filterSidebar');
@@ -6,8 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
     document.body.appendChild(overlay);
-    const searchBtn = document.querySelector('.search-btn');
-    searchBtn.addEventListener('click', applyFilters);
+    
     // Modal elements
     const productModal = document.getElementById('productModal');
     const closeModal = document.querySelector('.close-modal');
@@ -23,175 +22,41 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('displayUsername').textContent = userData.username;
     }
 
-    // Mock product data with all filter parameters and VIN numbers
-    const products = [
-        {
-            id: 1,
-            name: "Тормозные колодки Toyota Corolla",
-            brand: "Toyota",
-            model: "Corolla",
-            year: 2020,
-            price: 12500,
-            weight: 1.5,
-            category: "Тормоза",
-            condition: "new",
-            inStock: true,
-            hasWarranty: true,
-            sellerRating: 4.5,
-            vin: "TOYOTA2020COROLABRAK",
-            description: "Высококачественные тормозные колодки для Toyota Corolla 2015-2023. Обеспечивают отличное торможение и долгий срок службы.",
-            images: [
-                "Images/Тормозные колодки Toyota Corolla/11.webp",
-                "Images/Тормозные колодки Toyota Corolla/12.webp",
-                "Images/Тормозные колодки Toyota Corolla/13.webp",
-                "Images/Тормозные колодки Toyota Corolla/14.webp",
-                "Images/Тормозные колодки Toyota Corolla/15.webp"
-            ],
-            specifications: {
-                material: "Керамика",
-                compatibility: "Toyota Corolla 2015-2023",
-                warranty: "2 года"
+    // Load product data from JSON
+    let products = [];
+    try {
+        const response = await fetch('data/products.json');
+        if (!response.ok) throw new Error('Failed to load products');
+        products = await response.json();
+        console.log('Products loaded:', products);
+    } catch (error) {
+        console.error('Error loading products:', error);
+        // Fallback minimal product data
+        products = [
+            {
+                id: 1,
+                name: "Тормозные колодки Toyota Corolla",
+                brand: "Toyota",
+                model: "Corolla",
+                year: 2020,
+                price: 12500,
+                weight: 1.5,
+                category: "Тормоза",
+                condition: "new",
+                inStock: true,
+                hasWarranty: true,
+                sellerRating: 4.5,
+                vin: "TOYOTA2020COROLABRAK",
+                description: "Высококачественные тормозные колодки для Toyota Corolla",
+                images: ["Images/Тормозные колодки Toyota Corolla/11.webp"],
+                specifications: {
+                    material: "Керамика",
+                    compatibility: "Toyota Corolla 2015-2023",
+                    warranty: "2 года"
+                }
             }
-        },
-        {
-            id: 2,
-            name: "Масло моторное 5W-30 Lada Vesta",
-            brand: "Lada",
-            model: "Vesta",
-            year: 2018,
-            price: 3500,
-            weight: 4.0,
-            category: "Смазки",
-            condition: "new",
-            inStock: true,
-            hasWarranty: false,
-            sellerRating: 4.2,
-            vin: "LADA2018VESTAOIL",
-            description: "Синтетическое моторное масло 5W-30 для Lada Vesta. Оптимально для всех сезонов.",
-            images: [
-                "Images/Масло моторное 5W-30 Lada Vesta/21.webp",
-                "Images/Масло моторное 5W-30 Lada Vesta/22.webp",
-                "Images/Масло моторное 5W-30 Lada Vesta/23.webp",
-                "Images/Масло моторное 5W-30 Lada Vesta/24.webp",
-                "Images/Масло моторное 5W-30 Lada Vesta/25.webp"
-            ],
-            specifications: {
-                type: "Синтетическое",
-                volume: "4 литра",
-                viscosity: "5W-30"
-            }
-        },
-        {
-            id: 3,
-            name: "Амортизатор передний Honda Civic",
-            brand: "Honda",
-            model: "Civic",
-            year: 2019,
-            price: 8900,
-            weight: 3.2,
-            category: "Подвеска",
-            condition: "used",
-            inStock: true,
-            hasWarranty: true,
-            sellerRating: 4.0,
-            vin: "HONDA2019CIVICSHOCK",
-            description: "Амортизаторы передние для Honda Civic 2016-2021. Б/у в отличном состоянии.",
-            images: [
-                "Images/Амортизатор передний Honda Civic/31.webp",
-                "Images/Амортизатор передний Honda Civic/32.webp",
-                "Images/Амортизатор передний Honda Civic/33.webp",
-                "Images/Амортизатор передний Honda Civic/34.webp",
-                "Images/Амортизатор передний Honda Civic/35.webp"
-            ],
-            specifications: {
-                condition: "Б/У (отличное состояние)",
-                compatibility: "Honda Civic 2016-2021",
-                warranty: "6 месяцев"
-            }
-        },
-        {
-            id: 4,
-            name: "Свечи зажигания BMW X5",
-            brand: "BMW",
-            model: "X5",
-            year: 2021,
-            price: 4500,
-            weight: 0.5,
-            category: "Двигатель",
-            condition: "new",
-            inStock: false,
-            hasWarranty: true,
-            sellerRating: 4.7,
-            vin: "BMW2021X5SPARK",
-            description: "Оригинальные свечи зажигания для BMW X5. Обеспечивают стабильную работу двигателя.",
-            images: [
-                "Images/Свечи зажигания BMW X5/41.webp",
-                "Images/Свечи зажигания BMW X5/42.webp",
-                "Images/Свечи зажигания BMW X5/43.webp",
-                "Images/Свечи зажигания BMW X5/44.webp",
-                "Images/Свечи зажигания BMW X5/45.webp"
-            ],
-            specifications: {
-                type: "Иридиевые",
-                quantity: "6 штук",
-                warranty: "1 год"
-            }
-        },
-        {
-            id: 5,
-            name: "Ремень ГРМ Toyota Camry",
-            brand: "Toyota",
-            model: "Camry",
-            year: 2017,
-            price: 6800,
-            weight: 1.2,
-            category: "Двигатель",
-            condition: "used",
-            inStock: true,
-            hasWarranty: false,
-            sellerRating: 3.8,
-            vin: "TOYOTA2017CAMRYBELT",
-            description: "Ремень ГРМ для Toyota Camry 2012-2017. Б/у, но в хорошем состоянии.",
-            images: [
-                "Images/Ремень ГРМ Toyota Camry/51.webp",
-                "Images/Ремень ГРМ Toyota Camry/52.webp",
-                "Images/Ремень ГРМ Toyota Camry/53.webp",
-                "Images/Ремень ГРМ Toyota Camry/54.webp",
-                "Images/Ремень ГРМ Toyota Camry/55.webp"
-            ],
-            specifications: {
-                condition: "Б/У (хорошее состояние)",
-                compatibility: "Toyota Camry 2012-2017"
-            }
-        },
-        {
-            id: 6,
-            name: "Воздушный фильтр Lada Granta",
-            brand: "Lada",
-            model: "Granta",
-            year: 2020,
-            price: 2800,
-            weight: 0.3,
-            category: "Фильтры",
-            condition: "new",
-            inStock: true,
-            hasWarranty: false,
-            sellerRating: 4.1,
-            vin: "LADA2020GRANTAFILT",
-            description: "Воздушный фильтр для Lada Granta. Обеспечивает чистый воздух для двигателя.",
-            images: [
-                "Images/Воздушный фильтр Lada Granta/61.webp",
-                "Images/Воздушный фильтр Lada Granta/62.webp",
-                "Images/Воздушный фильтр Lada Granta/63.webp",
-                "Images/Воздушный фильтр Lada Granta/64.webp",
-                "Images/Воздушный фильтр Lada Granta/65.webp"
-            ],
-            specifications: {
-                type: "Бумажный",
-                compatibility: "Lada Granta 2011-2023"
-            }
-        }
-    ];
+        ];
+    }
 
     // Initialize cart
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -230,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Current image index for modal carousel
     let currentImageIndex = 0;
-    let currentProductImages = [];
 
     // Toggle filter sidebar
     filterToggle.addEventListener('click', () => {
@@ -296,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="product-image-container">
                     <div class="product-image" id="productImage-${product.id}">
                         <img src="${product.images[0]}" alt="${product.name}" 
-                             onerror="this.src='https://via.placeholder.com/300x225?text=No+Image'">
+                             onerror="this.onerror=null;this.src='https://via.placeholder.com/300x225?text=No+Image'">
                     </div>
                 </div>
                 <div class="product-info">
@@ -364,7 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show product modal with image carousel
     function showProductModal(product) {
         currentImageIndex = 0;
-        currentProductImages = product.images;
         
         modalBody.innerHTML = `
             <div class="modal-images">
@@ -372,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="main-image-wrapper">
                         <img src="${product.images[0]}" alt="${product.name}" 
                              class="main-image"
-                             onerror="this.src='https://via.placeholder.com/800x450?text=No+Image'">
+                             onerror="this.onerror=null;this.src='https://via.placeholder.com/800x450?text=No+Image'">
                     </div>
                     <button class="carousel-prev">&lt;</button>
                     <button class="carousel-next">&gt;</button>
@@ -383,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <img src="${img}" alt="${product.name} Thumbnail ${index + 1}" 
                                  class="thumbnail ${index === 0 ? 'active' : ''}" 
                                  data-index="${index}"
-                                 onerror="this.src='https://via.placeholder.com/80x60?text=No+Image'">
+                                 onerror="this.onerror=null;this.src='https://via.placeholder.com/80x60?text=No+Image'">
                         </div>
                     `).join('')}
                 </div>
@@ -424,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const nextButton = document.querySelector('.carousel-next');
 
         function updateMainImage(index) {
-            mainImage.src = currentProductImages[index];
+            mainImage.src = product.images[index];
             thumbnails.forEach(thumb => thumb.classList.remove('active'));
             thumbnails[index].classList.add('active');
             currentImageIndex = index;
@@ -438,13 +301,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         prevButton.addEventListener('click', function(e) {
             e.stopPropagation();
-            const newIndex = (currentImageIndex - 1 + currentProductImages.length) % currentProductImages.length;
+            const newIndex = (currentImageIndex - 1 + product.images.length) % product.images.length;
             updateMainImage(newIndex);
         });
 
         nextButton.addEventListener('click', function(e) {
             e.stopPropagation();
-            const newIndex = (currentImageIndex + 1) % currentProductImages.length;
+            const newIndex = (currentImageIndex + 1) % product.images.length;
             updateMainImage(newIndex);
         });
 
@@ -511,13 +374,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Go to cart page
-    cartIcon.addEventListener('click', function() {
-        window.location.href = 'cart/index.html';
-    });
+    if (cartIcon) {
+        cartIcon.addEventListener('click', function() {
+            window.location.href = 'cart/index.html';
+        });
+    }
 
     // Apply filters
     function applyFilters() {
-        const searchTerm = searchInput.value.toLowerCase() || productSearch.value.toLowerCase();
+        const searchTerm = (searchInput.value || productSearch.value).toLowerCase();
         const selectedBrand = brandFilter.value;
         const selectedModel = modelFilter.value;
         const minYearValue = parseInt(minYear.value) || 1990;
@@ -538,9 +403,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const filtered = products.filter(product => {
             // Search term (name or VIN)
             const matchesSearch = searchTerm 
-            ? product.name.toLowerCase().includes(searchTerm) || 
-              product.vin.toLowerCase().includes(searchTerm)
-            : true;
+                ? product.name.toLowerCase().includes(searchTerm) || 
+                  product.vin.toLowerCase().includes(searchTerm)
+                : true;
             
             // Brand and model
             const matchesBrand = selectedBrand ? product.brand === selectedBrand : true;
@@ -572,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Warranty
             const matchesWarranty = onlyWithWarranty ? product.hasWarranty : true;
             
-            // Rating - now properly filters based on star selection
+            // Rating
             const matchesRating = minRating === 0 ? true : product.sellerRating >= minRating;
             
             return matchesSearch && matchesBrand && matchesModel && matchesYear && 
@@ -623,6 +488,12 @@ document.addEventListener('DOMContentLoaded', function() {
     productSearch.addEventListener('keyup', function(e) {
         if (e.key === 'Enter') applyFilters();
     });
+
+    // Add click event for search button
+    const searchBtn = document.querySelector('.search-btn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', applyFilters);
+    }
 
     // Logout
     document.querySelector('.logout-btn').addEventListener('click', function() {
