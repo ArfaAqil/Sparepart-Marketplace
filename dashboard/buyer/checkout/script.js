@@ -45,9 +45,25 @@ document.addEventListener('DOMContentLoaded', function() {
         setupPaymentMethods();
         setupFormValidation();
         setDefaultDeliveryDate();
+        populateUserData();
+    }
+
+    function populateUserData() {
+        // Auto-fill user data if available
+        if (userData.fullName) {
+            document.getElementById('fullName').value = userData.fullName;
+        }
+        if (userData.phone) {
+            document.getElementById('phone').value = userData.phone;
+        }
+        if (userData.email) {
+            document.getElementById('email').value = userData.email;
+        }
     }
 
     function updateOrderSummary() {
+        if (!orderItems) return;
+        
         orderItems.innerHTML = '';
         orderSummary.items.forEach(item => {
             const itemElement = document.createElement('div');
@@ -65,32 +81,64 @@ document.addEventListener('DOMContentLoaded', function() {
             orderItems.appendChild(itemElement);
         });
 
-        orderSubtotal.textContent = orderSummary.subtotal.toLocaleString('ru-RU') + ' ₽';
-        orderShipping.textContent = orderSummary.shipping.toLocaleString('ru-RU') + ' ₽';
-        orderTotal.textContent = orderSummary.total.toLocaleString('ru-RU') + ' ₽';
+        if (orderSubtotal) {
+            orderSubtotal.textContent = orderSummary.subtotal.toLocaleString('ru-RU') + ' ₽';
+        }
+        if (orderShipping) {
+            orderShipping.textContent = orderSummary.shipping.toLocaleString('ru-RU') + ' ₽';
+        }
+        if (orderTotal) {
+            orderTotal.textContent = orderSummary.total.toLocaleString('ru-RU') + ' ₽';
+        }
     }
 
     function setupPaymentMethods() {
+        if (!cardPayment || !codPayment || !cardDetails || !codDetails) return;
+
         cardPayment.checked = true;
         cardDetails.style.display = 'block';
         codDetails.style.display = 'none';
+        
+        // Set initial required state
+        toggleCardDetailsRequired(true);
 
         cardPayment.addEventListener('change', function() {
             cardDetails.style.display = this.checked ? 'block' : 'none';
             codDetails.style.display = this.checked ? 'none' : 'block';
+            toggleCardDetailsRequired(this.checked);
             if (!this.checked) updateCodPaymentDetails();
         });
 
         codPayment.addEventListener('change', function() {
             cardDetails.style.display = 'none';
             codDetails.style.display = 'block';
+            toggleCardDetailsRequired(false);
             updateCodPaymentDetails();
         });
     }
 
+    function toggleCardDetailsRequired(required) {
+        const cardFields = ['cardNumber', 'cardExpiry', 'cardCvv'];
+        cardFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) field.required = required;
+        });
+    }
+
     function setupFormValidation() {
-        document.getElementById('cardNumber')?.addEventListener('input', formatCardNumber);
-        document.getElementById('cardExpiry')?.addEventListener('input', formatCardExpiry);
+        if (!deliveryForm) return;
+
+        // Formatting handlers
+        const cardNumberInput = document.getElementById('cardNumber');
+        if (cardNumberInput) {
+            cardNumberInput.addEventListener('input', formatCardNumber);
+        }
+
+        const cardExpiryInput = document.getElementById('cardExpiry');
+        if (cardExpiryInput) {
+            cardExpiryInput.addEventListener('input', formatCardExpiry);
+        }
+
         deliveryForm.addEventListener('submit', handleFormSubmit);
     }
 
@@ -115,8 +163,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (isProcessing) return;
         isProcessing = true;
-        submitOrderBtn.disabled = true;
-        submitOrderBtn.textContent = 'Обработка...';
+        
+        if (submitOrderBtn) {
+            submitOrderBtn.disabled = true;
+            submitOrderBtn.textContent = 'Обработка...';
+        }
 
         try {
             if (!validateForm()) {
@@ -132,17 +183,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             saveOrderToHistory(order);
-            localStorage.removeItem('cart');
-            localStorage.removeItem('orderSummary');
+            clearCheckoutData();
             
             window.location.href = '../order/order-history.html';
         } catch (error) {
             console.error('Ошибка оформления заказа:', error);
             alert(error.message);
             isProcessing = false;
-            submitOrderBtn.disabled = false;
-            submitOrderBtn.textContent = 'Оформить заказ';
+            
+            if (submitOrderBtn) {
+                submitOrderBtn.disabled = false;
+                submitOrderBtn.textContent = 'Оформить заказ';
+            }
         }
+    }
+
+    function clearCheckoutData() {
+        localStorage.removeItem('cart');
+        localStorage.removeItem('orderSummary');
     }
 
     function validateForm() {
@@ -158,6 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        // Email validation
         const email = document.getElementById('email').value;
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             alert('Пожалуйста, введите корректный email');
@@ -165,9 +224,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
+        // Phone validation (basic Russian phone format)
         const phone = document.getElementById('phone').value;
-        if (!/^[\d\s\-\+\(\)]{11,}$/.test(phone)) {
-            alert('Пожалуйста, введите корректный номер телефона');
+        if (!/^[\d\s\-\+\(\)]{11,}$/.test(phone.replace(/[\s\-\+\(\)]/g, ''))) {
+            alert('Пожалуйста, введите корректный номер телефона (минимум 11 цифр)');
             document.getElementById('phone').focus();
             return false;
         }
@@ -226,11 +286,16 @@ document.addEventListener('DOMContentLoaded', function() {
             // Simulate payment processing only for card payments
             if (order.paymentMethod === 'card') {
                 await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Simulate random payment failures (10% chance)
+                if (Math.random() < 0.1) {
+                    throw new Error('Ошибка обработки платежа. Пожалуйста, проверьте данные карты.');
+                }
             }
             return true;
         } catch (error) {
             console.error('Payment processing error:', error);
-            return false;
+            throw error;
         }
     }
 
@@ -239,10 +304,14 @@ document.addEventListener('DOMContentLoaded', function() {
             let orders = [];
             const ordersData = localStorage.getItem('orders');
             
-            if (ordersData && ordersData.trim() !== '') {
-                orders = JSON.parse(ordersData);
-                if (!Array.isArray(orders)) {
-                    console.warn('Orders data was corrupted, resetting to empty array');
+            if (ordersData) {
+                try {
+                    orders = JSON.parse(ordersData);
+                    if (!Array.isArray(orders)) {
+                        orders = [];
+                    }
+                } catch (e) {
+                    console.warn('Failed to parse orders data, initializing new array');
                     orders = [];
                 }
             }
@@ -253,18 +322,23 @@ document.addEventListener('DOMContentLoaded', function() {
             return true;
         } catch (error) {
             console.error('Failed to save order to history:', error);
+            // Fallback - try to save just the current order
             localStorage.setItem('orders', JSON.stringify([order]));
             return true;
         }
     }
 
     function updateCodPaymentDetails() {
+        if (!paymentAmount || !qrCode) return;
+
         const codTotal = Math.round(orderSummary.total * 1.02);
         paymentAmount.textContent = codTotal.toLocaleString('ru-RU') + ' ₽';
         generateQRCode(`COD-${Date.now().toString().slice(-6)}`);
     }
 
     async function generateQRCode(data) {
+        if (!qrCode) return;
+
         try {
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(data)}`;
             const img = document.createElement('img');
@@ -279,9 +353,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function setDefaultDeliveryDate() {
+        const deliveryDateInput = document.getElementById('deliveryDate');
+        if (!deliveryDateInput) return;
+
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-        document.getElementById('deliveryDate').valueAsDate = tomorrow;
+        
+        // Format as YYYY-MM-DD
+        const formattedDate = tomorrow.toISOString().split('T')[0];
+        deliveryDateInput.value = formattedDate;
+        deliveryDateInput.min = formattedDate; // Prevent selecting past dates
     }
 
     if (citySelect) {
@@ -314,6 +395,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateShippingCost() {
+        if (!orderSummary?.items) return;
+
         const baseShipping = orderSummary.items.reduce(
             (total, item) => total + (item.weight * item.quantity * 100), 0);
         const distanceCost = currentDistance * 15;
@@ -321,12 +404,16 @@ document.addEventListener('DOMContentLoaded', function() {
         orderSummary.shipping = Math.max(baseShipping + distanceCost, 1000);
         orderSummary.total = orderSummary.subtotal + orderSummary.shipping;
         
-        orderShipping.textContent = orderSummary.shipping.toLocaleString('ru-RU') + ' ₽';
-        orderTotal.textContent = orderSummary.total.toLocaleString('ru-RU') + ' ₽';
+        if (orderShipping) {
+            orderShipping.textContent = orderSummary.shipping.toLocaleString('ru-RU') + ' ₽';
+        }
+        if (orderTotal) {
+            orderTotal.textContent = orderSummary.total.toLocaleString('ru-RU') + ' ₽';
+        }
         
         localStorage.setItem('orderSummary', JSON.stringify(orderSummary));
         
-        if (codPayment.checked) {
+        if (codPayment?.checked) {
             updateCodPaymentDetails();
         }
     }
