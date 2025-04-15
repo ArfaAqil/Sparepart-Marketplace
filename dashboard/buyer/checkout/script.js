@@ -68,9 +68,14 @@ document.addEventListener('DOMContentLoaded', function() {
         orderSummary.items.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.className = 'order-item';
+            const firstImagePath = `/dashboard/buyer/${item.images[0]}`;
+
             itemElement.innerHTML = `
-                <div class="order-item-image">
-                    <img src="${item.images[0]}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/100'">
+                <div class="order-item-image-container">
+                    <div class="order-item-image">
+                        <img src="${firstImagePath}" alt="${item.name}" 
+                            onerror="this.onerror=null;this.src='https://via.placeholder.com/80?text=No+Image'">
+                    </div>
                 </div>
                 <div class="order-item-details">
                     <h4>${item.name}</h4>

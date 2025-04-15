@@ -45,7 +45,7 @@
                 <div class="search-filter-container">
                     <div class="search-box">
                         <input type="text" placeholder="Поиск по названию или VIN..." id="searchInput">
-                        <button class="search-btn"><i class="fas fa-search"></i></button>
+                        <button class="search-btn" id="searchButton"><i class="fas fa-search"></i></button>
                     </div>
                     <button class="filter-toggle" id="filterToggle">
                         <i class="fas fa-sliders-h"></i> Фильтры
@@ -135,6 +135,14 @@
                     <div class="filter-checkbox">
                         <input type="checkbox" id="categorySuspension" checked>
                         <label for="categorySuspension">Подвеска</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="categoryFilter" checked>
+                        <label for="categoryFilter">Фильтры</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="categoryLubrication" checked>
+                        <label for="categoryLubrication">Смазки</label>
                     </div>
                 </div>
                 

@@ -35,12 +35,20 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // In displayCartItems() function, update the image path:
         cart.forEach((item, index) => {
             const itemElement = document.createElement('div');
             itemElement.className = 'cart-item';
+            
+            // Use absolute path to the first image
+            const firstImagePath = `/dashboard/buyer/${item.images[0]}`;
+
             itemElement.innerHTML = `
-                <div class="cart-item-image">
-                    <img src="${item.images[0]}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/100'">
+                <div class="cart-item-image-container">
+                    <div class="cart-item-image">
+                        <img src="${firstImagePath}" alt="${item.name}" 
+                            onerror="this.onerror=null;this.src='https://via.placeholder.com/100?text=No+Image'">
+                    </div>
                 </div>
                 <div class="cart-item-details">
                     <h4>${item.name}</h4>

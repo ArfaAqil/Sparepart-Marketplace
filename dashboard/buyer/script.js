@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
     document.body.appendChild(overlay);
-    
+    const searchBtn = document.querySelector('.search-btn');
+    searchBtn.addEventListener('click', applyFilters);
     // Modal elements
     const productModal = document.getElementById('productModal');
     const closeModal = document.querySelector('.close-modal');
@@ -22,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('displayUsername').textContent = userData.username;
     }
 
-    // Mock product data with all filter parameters
+    // Mock product data with all filter parameters and VIN numbers
     const products = [
         {
             id: 1,
@@ -37,8 +38,15 @@ document.addEventListener('DOMContentLoaded', function() {
             inStock: true,
             hasWarranty: true,
             sellerRating: 4.5,
+            vin: "TOYOTA2020COROLABRAK",
             description: "Высококачественные тормозные колодки для Toyota Corolla 2015-2023. Обеспечивают отличное торможение и долгий срок службы.",
-            images: ["https://via.placeholder.com/500x300?text=Toyota+Brakes", "https://via.placeholder.com/500x300?text=Toyota+Brakes+2"],
+            images: [
+                "Images/Тормозные колодки Toyota Corolla/11.webp",
+                "Images/Тормозные колодки Toyota Corolla/12.webp",
+                "Images/Тормозные колодки Toyota Corolla/13.webp",
+                "Images/Тормозные колодки Toyota Corolla/14.webp",
+                "Images/Тормозные колодки Toyota Corolla/15.webp"
+            ],
             specifications: {
                 material: "Керамика",
                 compatibility: "Toyota Corolla 2015-2023",
@@ -58,8 +66,15 @@ document.addEventListener('DOMContentLoaded', function() {
             inStock: true,
             hasWarranty: false,
             sellerRating: 4.2,
+            vin: "LADA2018VESTAOIL",
             description: "Синтетическое моторное масло 5W-30 для Lada Vesta. Оптимально для всех сезонов.",
-            images: ["https://via.placeholder.com/500x300?text=Lada+Oil", "https://via.placeholder.com/500x300?text=Lada+Oil+2"],
+            images: [
+                "Images/Масло моторное 5W-30 Lada Vesta/21.webp",
+                "Images/Масло моторное 5W-30 Lada Vesta/22.webp",
+                "Images/Масло моторное 5W-30 Lada Vesta/23.webp",
+                "Images/Масло моторное 5W-30 Lada Vesta/24.webp",
+                "Images/Масло моторное 5W-30 Lada Vesta/25.webp"
+            ],
             specifications: {
                 type: "Синтетическое",
                 volume: "4 литра",
@@ -79,8 +94,15 @@ document.addEventListener('DOMContentLoaded', function() {
             inStock: true,
             hasWarranty: true,
             sellerRating: 4.0,
+            vin: "HONDA2019CIVICSHOCK",
             description: "Амортизаторы передние для Honda Civic 2016-2021. Б/у в отличном состоянии.",
-            images: ["https://via.placeholder.com/500x300?text=Honda+Shock", "https://via.placeholder.com/500x300?text=Honda+Shock+2"],
+            images: [
+                "Images/Амортизатор передний Honda Civic/31.webp",
+                "Images/Амортизатор передний Honda Civic/32.webp",
+                "Images/Амортизатор передний Honda Civic/33.webp",
+                "Images/Амортизатор передний Honda Civic/34.webp",
+                "Images/Амортизатор передний Honda Civic/35.webp"
+            ],
             specifications: {
                 condition: "Б/У (отличное состояние)",
                 compatibility: "Honda Civic 2016-2021",
@@ -100,8 +122,15 @@ document.addEventListener('DOMContentLoaded', function() {
             inStock: false,
             hasWarranty: true,
             sellerRating: 4.7,
+            vin: "BMW2021X5SPARK",
             description: "Оригинальные свечи зажигания для BMW X5. Обеспечивают стабильную работу двигателя.",
-            images: ["https://via.placeholder.com/500x300?text=BMW+Spark", "https://via.placeholder.com/500x300?text=BMW+Spark+2"],
+            images: [
+                "Images/Свечи зажигания BMW X5/41.webp",
+                "Images/Свечи зажигания BMW X5/42.webp",
+                "Images/Свечи зажигания BMW X5/43.webp",
+                "Images/Свечи зажигания BMW X5/44.webp",
+                "Images/Свечи зажигания BMW X5/45.webp"
+            ],
             specifications: {
                 type: "Иридиевые",
                 quantity: "6 штук",
@@ -121,8 +150,15 @@ document.addEventListener('DOMContentLoaded', function() {
             inStock: true,
             hasWarranty: false,
             sellerRating: 3.8,
+            vin: "TOYOTA2017CAMRYBELT",
             description: "Ремень ГРМ для Toyota Camry 2012-2017. Б/у, но в хорошем состоянии.",
-            images: ["https://via.placeholder.com/500x300?text=Toyota+Belt", "https://via.placeholder.com/500x300?text=Toyota+Belt+2"],
+            images: [
+                "Images/Ремень ГРМ Toyota Camry/51.webp",
+                "Images/Ремень ГРМ Toyota Camry/52.webp",
+                "Images/Ремень ГРМ Toyota Camry/53.webp",
+                "Images/Ремень ГРМ Toyota Camry/54.webp",
+                "Images/Ремень ГРМ Toyota Camry/55.webp"
+            ],
             specifications: {
                 condition: "Б/У (хорошее состояние)",
                 compatibility: "Toyota Camry 2012-2017"
@@ -141,8 +177,15 @@ document.addEventListener('DOMContentLoaded', function() {
             inStock: true,
             hasWarranty: false,
             sellerRating: 4.1,
+            vin: "LADA2020GRANTAFILT",
             description: "Воздушный фильтр для Lada Granta. Обеспечивает чистый воздух для двигателя.",
-            images: ["https://via.placeholder.com/500x300?text=Lada+Filter", "https://via.placeholder.com/500x300?text=Lada+Filter+2"],
+            images: [
+                "Images/Воздушный фильтр Lada Granta/61.webp",
+                "Images/Воздушный фильтр Lada Granta/62.webp",
+                "Images/Воздушный фильтр Lada Granta/63.webp",
+                "Images/Воздушный фильтр Lada Granta/64.webp",
+                "Images/Воздушный фильтр Lada Granta/65.webp"
+            ],
             specifications: {
                 type: "Бумажный",
                 compatibility: "Lada Granta 2011-2023"
@@ -169,6 +212,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const categoryBrakes = document.getElementById('categoryBrakes');
     const categoryEngine = document.getElementById('categoryEngine');
     const categorySuspension = document.getElementById('categorySuspension');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const categoryLubrication = document.getElementById('categoryLubrication');
     const inStockOnly = document.getElementById('inStockOnly');
     const hasWarranty = document.getElementById('hasWarranty');
     const applyFilter = document.querySelector('.apply-filter');
@@ -182,6 +227,10 @@ document.addEventListener('DOMContentLoaded', function() {
         'Honda': ['Civic', 'Accord', 'CR-V'],
         'BMW': ['X5', '3 Series', '5 Series']
     };
+
+    // Current image index for modal carousel
+    let currentImageIndex = 0;
+    let currentProductImages = [];
 
     // Toggle filter sidebar
     filterToggle.addEventListener('click', () => {
@@ -223,14 +272,9 @@ document.addEventListener('DOMContentLoaded', function() {
         star.addEventListener('click', function() {
             const rating = parseInt(this.dataset.rating);
             
-            // Highlight selected star and all above it
-            stars.forEach((s, index) => {
-                if (index <= 5 - rating) {
-                    s.classList.add('active');
-                } else {
-                    s.classList.remove('active');
-                }
-            });
+            // Toggle active class
+            stars.forEach(s => s.classList.remove('active'));
+            this.classList.add('active');
         });
     });
 
@@ -249,8 +293,11 @@ document.addEventListener('DOMContentLoaded', function() {
             card.className = 'product-card';
             card.dataset.id = product.id;
             card.innerHTML = `
-                <div class="product-image">
-                    <span>${product.name}</span>
+                <div class="product-image-container">
+                    <div class="product-image" id="productImage-${product.id}">
+                        <img src="${product.images[0]}" alt="${product.name}" 
+                             onerror="this.src='https://via.placeholder.com/300x225?text=No+Image'">
+                    </div>
                 </div>
                 <div class="product-info">
                     <h3 class="product-title">${product.name}</h3>
@@ -294,13 +341,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 addToCart(product);
             });
         });
+
+        // Detect image orientation after render
+        setTimeout(() => {
+            productsToRender.forEach(product => {
+                const imgContainer = document.getElementById(`productImage-${product.id}`);
+                if (imgContainer) {
+                    const img = imgContainer.querySelector('img');
+                    
+                    img.onload = function() {
+                        if (this.naturalHeight > this.naturalWidth) {
+                            imgContainer.classList.add('portrait');
+                        }
+                    };
+                    
+                    if (img.complete) img.onload();
+                }
+            });
+        }, 0);
     }
 
-    // Show product modal
+    // Show product modal with image carousel
     function showProductModal(product) {
+        currentImageIndex = 0;
+        currentProductImages = product.images;
+        
         modalBody.innerHTML = `
             <div class="modal-images">
-                ${product.images.map(img => `<img src="${img}" alt="${product.name}">`).join('')}
+                <div class="main-image-container">
+                    <div class="main-image-wrapper">
+                        <img src="${product.images[0]}" alt="${product.name}" 
+                             class="main-image"
+                             onerror="this.src='https://via.placeholder.com/800x450?text=No+Image'">
+                    </div>
+                    <button class="carousel-prev">&lt;</button>
+                    <button class="carousel-next">&gt;</button>
+                </div>
+                <div class="thumbnail-container">
+                    ${product.images.map((img, index) => `
+                        <div class="thumbnail-item">
+                            <img src="${img}" alt="${product.name} Thumbnail ${index + 1}" 
+                                 class="thumbnail ${index === 0 ? 'active' : ''}" 
+                                 data-index="${index}"
+                                 onerror="this.src='https://via.placeholder.com/80x60?text=No+Image'">
+                        </div>
+                    `).join('')}
+                </div>
             </div>
             <div class="modal-details">
                 <h2>${product.name}</h2>
@@ -309,6 +395,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Марка:</strong> ${product.brand}</p>
                     <p><strong>Модель:</strong> ${product.model}</p>
                     <p><strong>Год:</strong> ${product.year}</p>
+                    <p><strong>VIN:</strong> ${product.vin}</p>
                     <p><strong>Состояние:</strong> ${product.condition === 'new' ? 'Новый' : 'Б/У'}</p>
                     <p><strong>Категория:</strong> ${product.category}</p>
                     <p><strong>Вес:</strong> ${product.weight} кг</p>
@@ -329,6 +416,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button class="modal-add-to-cart">В корзину</button>
             </div>
         `;
+
+        // Add event listeners for carousel navigation
+        const mainImage = document.querySelector('.main-image');
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const prevButton = document.querySelector('.carousel-prev');
+        const nextButton = document.querySelector('.carousel-next');
+
+        function updateMainImage(index) {
+            mainImage.src = currentProductImages[index];
+            thumbnails.forEach(thumb => thumb.classList.remove('active'));
+            thumbnails[index].classList.add('active');
+            currentImageIndex = index;
+        }
+
+        thumbnails.forEach(thumb => {
+            thumb.addEventListener('click', function() {
+                updateMainImage(parseInt(this.dataset.index));
+            });
+        });
+
+        prevButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const newIndex = (currentImageIndex - 1 + currentProductImages.length) % currentProductImages.length;
+            updateMainImage(newIndex);
+        });
+
+        nextButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const newIndex = (currentImageIndex + 1) % currentProductImages.length;
+            updateMainImage(newIndex);
+        });
 
         // Add event listener to modal add to cart button
         document.querySelector('.modal-add-to-cart').addEventListener('click', function() {
@@ -409,6 +527,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const showUsed = usedCondition.checked;
         const showBrakes = categoryBrakes.checked;
         const showEngine = categoryEngine.checked;
+        const showFilter = categoryFilter.checked;
+        const showLubrication = categoryLubrication.checked;
         const showSuspension = categorySuspension.checked;
         const onlyInStock = inStockOnly.checked;
         const onlyWithWarranty = hasWarranty.checked;
@@ -416,8 +536,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const minRating = activeStar ? parseInt(activeStar.dataset.rating) : 0;
         
         const filtered = products.filter(product => {
-            // Search term
-            const matchesSearch = product.name.toLowerCase().includes(searchTerm);
+            // Search term (name or VIN)
+            const matchesSearch = searchTerm 
+            ? product.name.toLowerCase().includes(searchTerm) || 
+              product.vin.toLowerCase().includes(searchTerm)
+            : true;
             
             // Brand and model
             const matchesBrand = selectedBrand ? product.brand === selectedBrand : true;
@@ -438,7 +561,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const matchesCategory = 
                 (showBrakes && product.category === 'Тормоза') ||
                 (showEngine && product.category === 'Двигатель') ||
+                (showFilter && product.category === 'Фильтры') ||
+                (showLubrication && product.category === 'Смазки') ||
                 (showSuspension && product.category === 'Подвеска');
+                
             
             // Availability
             const matchesAvailability = onlyInStock ? product.inStock : true;
@@ -446,8 +572,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Warranty
             const matchesWarranty = onlyWithWarranty ? product.hasWarranty : true;
             
-            // Rating
-            const matchesRating = product.sellerRating >= minRating;
+            // Rating - now properly filters based on star selection
+            const matchesRating = minRating === 0 ? true : product.sellerRating >= minRating;
             
             return matchesSearch && matchesBrand && matchesModel && matchesYear && 
                    matchesPrice && matchesCondition && matchesCategory && 
@@ -476,6 +602,8 @@ document.addEventListener('DOMContentLoaded', function() {
         categoryBrakes.checked = true;
         categoryEngine.checked = true;
         categorySuspension.checked = true;
+        categoryFilter.checked = true;
+        categoryLubrication.checked = true;
         inStockOnly.checked = false;
         hasWarranty.checked = false;
         
