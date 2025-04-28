@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     const orderList = document.getElementById('orderList');
     const cartCounter = document.getElementById('cartCounter');
 
@@ -11,18 +11,24 @@ document.addEventListener('DOMContentLoaded', function() {
         cartCounter.textContent = '0';
     }
 
-    // Safe order history loading
+    // Load orders from orders.json and localStorage
     let orders = [];
     try {
-        const ordersData = localStorage.getItem('orders');
-        orders = ordersData ? JSON.parse(ordersData) : [];
-        if (!Array.isArray(orders)) {
-            orders = [];
-            localStorage.setItem('orders', '[]');
-        }
+        // Load from orders.json
+        const response = await fetch('../data/orders.json');
+        if (!response.ok) throw new Error('Failed to load orders.json');
+        const jsonOrders = await response.json();
+        
+        // Load from localStorage
+        const localOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+        
+        // Combine orders, ensuring no duplicates by orderNumber
+        const allOrders = [...jsonOrders, ...localOrders];
+        orders = Array.from(new Map(allOrders.map(o => [o.orderNumber, o])).values());
     } catch (e) {
         console.error('Error loading orders:', e);
-        localStorage.setItem('orders', '[]');
+        // Fallback to localStorage only
+        orders = JSON.parse(localStorage.getItem('orders') || '[]');
     }
 
     if (orders.length === 0) {
@@ -51,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="order-total">${order.paymentAmount.toLocaleString('ru-RU')} ₽</div>
             </div>
             <div class="order-actions">
-                <button class="cancel-order-btn" data-order="${order.orderNumber}">
+                <button class="cancel-order-btn" data-order="${order.orderNumber}" ${order.status === 'Отменен' ? 'disabled' : ''}>
                     Отменить
                 </button>
                 <button class="delete-order-btn" data-order="${order.orderNumber}">
@@ -79,14 +85,13 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error handling order action:', error);
         }
     });
-    
 
     function cancelOrder(orderId) {
         if (confirm('Вы уверены, что хотите отменить этот заказ?')) {
             try {
-                const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                let orders = JSON.parse(localStorage.getItem('orders') || '[]');
                 const updatedOrders = orders.map(order => 
-                    order.orderNumber === orderId ? {...order, status: 'Отменен'} : order
+                    order.orderNumber === orderId ? { ...order, status: 'Отменен' } : order
                 );
                 localStorage.setItem('orders', JSON.stringify(updatedOrders));
                 window.location.reload();
@@ -100,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function deleteOrder(orderId) {
         if (confirm('Вы уверены, что хотите удалить этот заказ?')) {
             try {
-                const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                let orders = JSON.parse(localStorage.getItem('orders') || '[]');
                 const updatedOrders = orders.filter(order => order.orderNumber !== orderId);
                 localStorage.setItem('orders', JSON.stringify(updatedOrders));
                 window.location.reload();

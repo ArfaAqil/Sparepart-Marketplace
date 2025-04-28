@@ -1,0 +1,24 @@
+[
+  {
+      "id": 1,
+      "username": "buyer1",
+      "email": "buyer1@example.com",
+      "password": "password123",
+      "role": "buyer"
+  },
+  {
+      "id": 2,
+      "username": "admin1",
+      "email": "admin1@example.com",
+      "password": "admin123",
+      "role": "admin",
+      "secretKey": "ADMKEY2025"
+  },
+  {
+      "id": 3,
+      "username": "seller1",
+      "email": "seller1@example.com",
+      "password": "seller123",
+      "role": "seller"
+  }
+]

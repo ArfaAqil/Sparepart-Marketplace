@@ -304,34 +304,74 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function saveOrderToHistory(order) {
-        try {
-            let orders = [];
-            const ordersData = localStorage.getItem('orders');
-            
-            if (ordersData) {
-                try {
-                    orders = JSON.parse(ordersData);
-                    if (!Array.isArray(orders)) {
-                        orders = [];
-                    }
-                } catch (e) {
-                    console.warn('Failed to parse orders data, initializing new array');
-                    orders = [];
-                }
-            }
-            
-            orders.unshift(order);
-            localStorage.setItem('orders', JSON.stringify(orders));
-            console.log('Order successfully saved to history');
-            return true;
-        } catch (error) {
-            console.error('Failed to save order to history:', error);
-            // Fallback - try to save just the current order
-            localStorage.setItem('orders', JSON.stringify([order]));
-            return true;
+    document.addEventListener('DOMContentLoaded', async function() {
+        const orderList = document.getElementById('orderList');
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+        
+        if (userData.username) {
+            document.getElementById('displayUsername').textContent = userData.username;
         }
-    }
+    
+        // Load orders from orders.json and localStorage
+        let orders = [];
+        try {
+            // Load from orders.json
+            const response = await fetch('../buyer/data/orders.json');
+            if (!response.ok) throw new Error('Failed to load orders.json');
+            const jsonOrders = await response.json();
+            
+            // Load from localStorage
+            const localOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+            
+            // Combine orders, ensuring no duplicates by orderNumber
+            const allOrders = [...jsonOrders, ...localOrders];
+            orders = Array.from(new Map(allOrders.map(o => [o.orderNumber, o])).values());
+        } catch (e) {
+            console.error('Error loading orders:', e);
+            // Fallback to localStorage only
+            orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        }
+    
+        if (orders.length === 0) {
+            orderList.innerHTML = '<p>Нет заказов.</p>';
+            return;
+        }
+    
+        orderList.innerHTML = orders.map(order => `
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-meta">
+                        <span class="order-number">Заказ #${order.orderNumber}</span>
+                        <span class="order-date">${new Date(order.date).toLocaleDateString('ru-RU')}</span>
+                    </div>
+                    <div class="order-status ${order.status === 'Отменен' ? 'cancelled' : ''}">
+                        ${order.status}
+                    </div>
+                </div>
+                <div class="order-details">
+                    <h3>Детали заказа</h3>
+                    <p><strong>Покупатель:</strong> ${order.customer.fullName}</p>
+                    <p><strong>Email:</strong> ${order.customer.email}</p>
+                    <p><strong>Телефон:</strong> ${order.customer.phone}</p>
+                    <p><strong>Город:</strong> ${order.customer.city}</p>
+                    <p><strong>Адрес:</strong> ${order.customer.address}</p>
+                    <p><strong>Дата доставки:</strong> ${new Date(order.date).toLocaleDateString('ru-RU')}</p>
+                    <p><strong>Сумма:</strong> ${order.paymentAmount.toLocaleString('ru-RU')} ₽</p>
+                    <h4>Товары:</h4>
+                    <ul>
+                        ${order.items.map(item => `
+                            <li>${item.name} (x${item.quantity}) - ${(item.price * item.quantity).toLocaleString('ru-RU')} ₽</li>
+                        `).join('')}
+                    </ul>
+                </div>
+            </div>
+        `).join('');
+    
+        document.querySelector('.logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('userData');
+            window.location.href = '../../auth/index.html';
+        });
+    });
 
     function updateCodPaymentDetails() {
         if (!paymentAmount || !qrCode) return;

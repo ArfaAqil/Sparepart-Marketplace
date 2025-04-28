@@ -1,0 +1,122 @@
+[
+    {
+        "orderNumber": "ORD-123456",
+        "status": "Оплачено",
+        "date": "2025-04-27T10:30:00.000Z",
+        "paymentMethod": "card",
+        "paymentAmount": 13500,
+        "subtotal": 12500,
+        "shipping": 1000,
+        "items": [
+            {
+                "id": 1,
+                "name": "Тормозные колодки Toyota Corolla",
+                "price": 12500,
+                "quantity": 1,
+                "brand": "Toyota",
+                "model": "Corolla",
+                "year": 2020,
+                "category": "Тормоза",
+                "condition": "new",
+                "inStock": true,
+                "hasWarranty": true,
+                "sellerRating": 4.5,
+                "vin": "TOYOTA2020COROLABRAK",
+                "description": "Высококачественные тормозные колодки для Toyota Corolla",
+                "images": ["Images/Тормозные колодки Toyota Corolla/11.webp"],
+                "specifications": {
+                    "material": "Керамика",
+                    "compatibility": "Toyota Corolla 2015-2023",
+                    "warranty": "2 года"
+                }
+            }
+        ],
+        "customer": {
+            "fullName": "Иван Иванов",
+            "phone": "+79991234567",
+            "email": "ivan@example.com",
+            "city": "Москва",
+            "address": "ул. Ленина, д. 10"
+        }
+    },
+    {
+        "orderNumber": "ORD-123457",
+        "status": "Ожидает оплаты",
+        "date": "2025-04-26T15:45:00.000Z",
+        "paymentMethod": "cod",
+        "paymentAmount": 27540,
+        "subtotal": 25000,
+        "shipping": 2000,
+        "items": [
+            {
+                "id": 1,
+                "name": "Тормозные колодки Toyota Corolla",
+                "price": 12500,
+                "quantity": 2,
+                "brand": "Toyota",
+                "model": "Corolla",
+                "year": 2020,
+                "category": "Тормоза",
+                "condition": "new",
+                "inStock": true,
+                "hasWarranty": true,
+                "sellerRating": 4.5,
+                "vin": "TOYOTA2020COROLABRAK",
+                "description": "Высококачественные тормозные колодки для Toyota Corolla",
+                "images": ["Images/Тормозные колодки Toyota Corolla/11.webp"],
+                "specifications": {
+                    "material": "Керамика",
+                    "compatibility": "Toyota Corolla 2015-2023",
+                    "warranty": "2 года"
+                }
+            }
+        ],
+        "customer": {
+            "fullName": "Анна Петрова",
+            "phone": "+79997654321",
+            "email": "anna@example.com",
+            "city": "Санкт-Петербург",
+            "address": "пр. Невский, д. 25"
+        }
+    },
+    {
+        "orderNumber": "ORD-123458",
+        "status": "Отменен",
+        "date": "2025-04-25T09:15:00.000Z",
+        "paymentMethod": "card",
+        "paymentAmount": 13500,
+        "subtotal": 12500,
+        "shipping": 1000,
+        "items": [
+            {
+                "id": 1,
+                "name": "Тормозные колодки Toyota Corolla",
+                "price": 12500,
+                "quantity": 1,
+                "brand": "Toyota",
+                "model": "Corolla",
+                "year": 2020,
+                "category": "Тормоза",
+                "condition": "new",
+                "inStock": true,
+                "hasWarranty": true,
+                "sellerRating": 4.5,
+                "vin": "TOYOTA2020COROLABRAK",
+                "description": "Высококачественные тормозные колодки для Toyota Corolla",
+                "images": ["Images/Тормозные колодки Toyota Corolla/11.webp"],
+                "specifications": {
+                    "material": "Керамика",
+                    "compatibility": "Toyota Corolla 2015-2023",
+                    "warranty": "2 года"
+                }
+            }
+        ],
+        "customer": {
+            "fullName": "Михаил Сидоров",
+            "phone": "+79993456789",
+            "email": "mikhail@example.com",
+            "city": "Казань",
+            "address": "ул. Баумана, д. 15"
+        }
+    }
+]
