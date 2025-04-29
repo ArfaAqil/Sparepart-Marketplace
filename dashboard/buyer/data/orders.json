@@ -23,7 +23,7 @@
                 "sellerRating": 4.5,
                 "vin": "TOYOTA2020COROLABRAK",
                 "description": "Высококачественные тормозные колодки для Toyota Corolla",
-                "images": ["Images/Тормозные колодки Toyota Corolla/11.webp"],
+                "images": ["../../Images/Тормозные колодки Toyota Corolla/11.webp"],
                 "specifications": {
                     "material": "Керамика",
                     "compatibility": "Toyota Corolla 2015-2023",
@@ -63,7 +63,7 @@
                 "sellerRating": 4.5,
                 "vin": "TOYOTA2020COROLABRAK",
                 "description": "Высококачественные тормозные колодки для Toyota Corolla",
-                "images": ["Images/Тормозные колодки Toyota Corolla/11.webp"],
+                "images": ["../../Images/Тормозные колодки Toyota Corolla/11.webp"],
                 "specifications": {
                     "material": "Керамика",
                     "compatibility": "Toyota Corolla 2015-2023",
@@ -103,7 +103,7 @@
                 "sellerRating": 4.5,
                 "vin": "TOYOTA2020COROLABRAK",
                 "description": "Высококачественные тормозные колодки для Toyota Corolla",
-                "images": ["Images/Тормозные колодки Toyota Corolla/11.webp"],
+                "images": ["../../Images/Тормозные колодки Toyota Corolla/11.webp"],
                 "specifications": {
                     "material": "Керамика",
                     "compatibility": "Toyota Corolla 2015-2023",

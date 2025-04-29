@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 </div>
                 <div class="form-group">
                     <label for="productImage">URL изображения</label>
-                    <input type="text" id="productImage" placeholder="Images/product/image.jpg">
+                    <input type="text" id="productImage" placeholder="../../Images/product/image.jpg">
                 </div>
                 <div class="modal-actions">
                     <button type="submit" class="btn">Сохранить</button>
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             category: document.getElementById('productCategory').value,
             condition: document.getElementById('productCondition').value,
             description: document.getElementById('productDescription').value,
-            images: [document.getElementById('productImage').value || 'Images/placeholder.jpg'],
+            images: [document.getElementById('productImage').value || '../../Images/placeholder.jpg'],
             inStock: true,
             hasWarranty: true,
             sellerRating: 4.5,
