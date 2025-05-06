@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог | Покупатель</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="logo">АВТОЗАПЧАСТИ</div>
+            <nav class="user-nav">
+                <span class="username">Добро пожаловать, <span id="displayUsername">Покупатель</span></span>
+                <a href="order/order-history.html" class="order-history-btn">
+                    <i class="fas fa-history"></i> История заказов
+                </a>
+                <div class="cart-icon-container">
+                    <i class="fas fa-shopping-cart" id="cartIcon"></i>
+                    <span class="cart-counter" id="cartCounter">0</span>
+                </div>
+                <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Product Modal -->
+    <div class="product-modal" id="productModal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be inserted by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <div class="container">
+            <!-- Search and Filter Section -->
+            <div class="dashboard-toolbar">
+                <h1>Каталог запчастей</h1>
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <input type="text" placeholder="Поиск по названию или VIN..." id="searchInput">
+                        <button class="search-btn" id="searchButton"><i class="fas fa-search"></i></button>
+                    </div>
+                    <button class="filter-toggle" id="filterToggle">
+                        <i class="fas fa-sliders-h"></i> Фильтры
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Sidebar -->
+            <div class="filter-sidebar" id="filterSidebar">
+                <div class="filter-header">
+                    <h3><i class="fas fa-filter"></i> Фильтры</h3>
+                    <button class="close-filter">&times;</button>
+                </div>
+                
+                <!-- Search within filters -->
+                <div class="filter-search">
+                    <input type="text" placeholder="Поиск по названию..." id="productSearch">
+                </div>
+                
+                <!-- Brand Filter -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-car"></i> Марка</h4>
+                    <select class="filter-select" id="brandFilter">
+                        <option value="">Все марки</option>
+                        <option value="Toyota">Toyota</option>
+                        <option value="Lada">Lada</option>
+                        <option value="Honda">Honda</option>
+                        <option value="BMW">BMW</option>
+                    </select>
+                </div>
+                
+                <!-- Model Filter -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-car-side"></i> Модель</h4>
+                    <select class="filter-select" id="modelFilter" disabled>
+                        <option value="">Сначала выберите марку</option>
+                    </select>
+                </div>
+                
+                <!-- Year Filter -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-calendar-alt"></i> Год выпуска</h4>
+                    <div class="year-range">
+                        <input type="number" id="minYear" placeholder="От" min="1990" max="2023">
+                        <span>-</span>
+                        <input type="number" id="maxYear" placeholder="До" min="1990" max="2023">
+                    </div>
+                </div>
+                
+                <!-- Price Filter -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-tags"></i> Цена (₽)</h4>
+                    <div class="price-range">
+                        <input type="range" min="0" max="100000" value="50000" id="priceSlider">
+                        <div class="price-values">
+                            <span id="minPrice">0</span>
+                            <span>-</span>
+                            <span id="maxPrice">100000</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Condition Filter -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-check-circle"></i> Состояние</h4>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="newCondition" checked>
+                        <label for="newCondition">Новые</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="usedCondition" checked>
+                        <label for="usedCondition">Б/У</label>
+                    </div>
+                </div>
+                
+                <!-- Category Filter -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-tag"></i> Категория запчасти</h4>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="categoryBrakes" checked>
+                        <label for="categoryBrakes">Тормоза</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="categoryEngine" checked>
+                        <label for="categoryEngine">Двигатель</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="categorySuspension" checked>
+                        <label for="categorySuspension">Подвеска</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="categoryFilter" checked>
+                        <label for="categoryFilter">Фильтры</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="categoryLubrication" checked>
+                        <label for="categoryLubrication">Смазки</label>
+                    </div>
+                </div>
+                
+                <!-- Availability Filter -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-box-open"></i> Наличие</h4>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="inStockOnly">
+                        <label for="inStockOnly">Только в наличии</label>
+                    </div>
+                </div>
+                
+                <!-- Warranty Filter -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-shield-alt"></i> Гарантия</h4>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="hasWarranty">
+                        <label for="hasWarranty">Только с гарантией</label>
+                    </div>
+                </div>
+                
+                <!-- Seller Rating Filter -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-star"></i> Рейтинг продавца</h4>
+                    <div class="rating-filter">
+                        <div class="stars">
+                            <span data-rating="5">★★★★★</span>
+                            <span data-rating="4">★★★★☆</span>
+                            <span data-rating="3">★★★☆☆</span>
+                            <span data-rating="2">★★☆☆☆</span>
+                            <span data-rating="1">★☆☆☆☆</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filter Actions -->
+                <div class="filter-actions">
+                    <button class="reset-filter">Сбросить</button>
+                    <button class="apply-filter">Применить</button>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="product-grid" id="productGrid">
+                <!-- Product cards will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>© 2025 Автозапчасти | <a href="#">Помощь</a> | <a href="#">О нас</a></p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>

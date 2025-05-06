@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Доставка заказов | Автозапчасти</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="logo">АВТОЗАПЧАСТИ</div>
+            <nav class="user-nav">
+                <a href="../index.html" class="home-btn"><i class="fas fa-home"></i> Главная</a>
+                <a href="../order/index.html" class="orders-btn"><i class="fas fa-box"></i> Заказы</a>
+                <span class="username">Добро пожаловать, <span id="displayUsername">Продавец</span></span>
+                <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="shipping-main">
+        <div class="container">
+            <div class="shipping-header-actions">
+                <h1>Доставка заказов</h1>
+                <div class="action-buttons">
+                    <button id="refreshShippingBtn" class="action-btn"><i class="fas fa-sync-alt"></i> Обновить</button>
+                </div>
+            </div>
+            
+            <div class="shipping-filters">
+                <select id="statusFilter" class="filter-select">
+                    <option value="all">Все статусы</option>
+                    <option value="Отправлено">Отправлено</option>
+                    <option value="Доставлено">Доставлено</option>
+                </select>
+                <input type="date" id="dateFilter" class="filter-select">
+                <input type="text" id="searchFilter" placeholder="Поиск по номеру или клиенту" class="filter-select">
+            </div>
+            
+            <div class="shipping-list" id="shippingList">
+                <!-- Orders will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>© 2025 Автозапчасти | <a href="#">Помощь</a> | <a href="#">О нас</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

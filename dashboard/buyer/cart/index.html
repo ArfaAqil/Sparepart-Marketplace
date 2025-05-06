@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина | Автозапчасти</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="logo">АВТОЗАПЧАСТИ</div>
+            <nav class="user-nav">
+                <span class="username">Добро пожаловать, <span id="displayUsername">Покупатель</span></span>
+                <div class="cart-icon-container">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-counter" id="cartCounter">0</span>
+                </div>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="cart-main">
+        <div class="container">
+            <h1>Ваша корзина</h1>
+            
+            <div class="cart-container">
+                <div class="cart-items" id="cartItems">
+                    <!-- Cart items will be inserted here by JavaScript -->
+                </div>
+                
+                <div class="cart-summary">
+                    <h2>Итого</h2>
+                    <div class="summary-row">
+                        <span>Товары</span>
+                        <span id="subtotal">0 ₽</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Доставка</span>
+                        <span id="shipping">0 ₽</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>К оплате</span>
+                        <span id="total">0 ₽</span>
+                    </div>
+                    <div class="cart-actions">
+                        <a href="../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Вернуться в каталог</a>
+                        <button class="checkout-btn" id="checkoutBtn">Перейти к оформлению</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>© 2025 Автозапчасти | <a href="#">Помощь</a> | <a href="#">О нас</a></p>
+        </div>
+    </footer>
+    <script>
+        // Function logout inline
+        function logout() {
+            localStorage.removeItem('userData');
+            window.location.href = '/auth/index.html';
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

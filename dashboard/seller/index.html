@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель продавца | Автозапчасти</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="logo">АВТОЗАПЧАСТИ</div>
+            <nav class="user-nav">
+                <a href="../index.html" class="home-btn"><i class="fas fa-home"></i> Главная</a>
+                <a href="shipping/index.html" class="shipping-btn"><i class="fas fa-truck"></i> Доставка</a>
+                <span class="username">Добро пожаловать, <span id="displayUsername">Продавец</span></span>
+                <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="seller-main">
+        <div class="container">
+            <h1>Панель продавца</h1>
+            <div class="seller-actions">
+                <button id="addProductBtn" class="action-btn"><i class="fas fa-plus"></i> Добавить продукт</button>
+                <a href="order/index.html" class="action-btn"><i class="fas fa-box"></i> Просмотреть заказы</a>
+            </div>
+            <h2>Ваши продукты</h2>
+            <div class="product-grid" id="productGrid">
+                <!-- Products will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Product Modal -->
+    <div class="product-modal" id="productModal">
+        <div class="modal-content">
+            <button class="close-modal">×</button>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be inserted by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>© 2025 Автозапчасти | <a href="#">Помощь</a> | <a href="#">О нас</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

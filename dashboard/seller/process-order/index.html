@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обработка заказа | Автозапчасти</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="logo">АВТОЗАПЧАСТИ</div>
+            <nav class="user-nav">
+                <a href="../index.html" class="home-btn"><i class="fas fa-home"></i> Главная</a>
+                <a href="../order/index.html" class="orders-btn"><i class="fas fa-box"></i> Заказы</a>
+                <span class="username">Добро пожаловать, <span id="displayUsername">Продавец</span></span>
+                <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="process-main">
+        <div class="container">
+            <h1>Обработка заказа #<span id="orderNumber"></span></h1>
+            <div id="orderDetails" class="order-details">
+                <!-- Order details will be loaded here -->
+            </div>
+            <div class="process-form">
+                <h2>Обновить статус заказа</h2>
+                <form id="processOrderForm">
+                    <div class="form-group">
+                        <label for="newStatus">Новый статус:</label>
+                        <select id="newStatus" name="newStatus" required>
+                            <option value="В обработке">В обработке</option>
+                            <option value="Отправлено">Отправлено</option>
+                            <option value="Доставлено">Доставлено</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="trackingNumber">Номер отслеживания (для статуса Отправлено):</label>
+                        <input type="text" id="trackingNumber" name="trackingNumber">
+                    </div>
+                    <div class="form-group">
+                        <label for="sellerNotes">Примечания продавца:</label>
+                        <textarea id="sellerNotes" name="sellerNotes" rows="4" placeholder="Введите примечания (например, детали упаковки, инструкции для курьера)"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn submit-btn">Обновить статус</button>
+                        <a href="../order/index.html" class="btn cancel-btn">Вернуться к заказам</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>© 2025 Автозапчасти | <a href="#">Помощь</a> | <a href="#">О нас</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

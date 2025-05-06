@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>История заказов | Автозапчасти</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="logo">АВТОЗАПЧАСТИ</div>
+            <nav class="user-nav">
+                <a href="../index.html" class="home-btn"><i class="fas fa-home"></i> Главная</a>
+                <a href="../shipping/index.html" class="shipping-btn"><i class="fas fa-truck"></i> Доставка</a>
+                <span class="username">Добро пожаловать, <span id="displayUsername">Покупатель</span></span>
+                <a href="../cart/index.html" class="cart-icon-container">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-counter" id="cartCounter">0</span>
+                </a>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="order-history-main">
+        <div class="container">
+            <h1>История заказов</h1>
+            
+            <div class="order-list" id="orderList">
+                <!-- Orders will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>© 2025 Автозапчасти</p>
+        </div>
+    </footer>
+
+    <script>
+        // Function logout inline
+        function logout() {
+            localStorage.removeItem('userData');
+            window.location.href = '/auth/index.html';
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
