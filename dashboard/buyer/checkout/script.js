@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM Elements
     const deliveryForm = document.getElementById('deliveryForm');
     const cardPayment = document.getElementById('cardPayment');
     const codPayment = document.getElementById('codPayment');
@@ -203,6 +202,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function saveOrderToHistory(order) {
+        // Load existing orders from localStorage
+        let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        
+        // Add new order
+        orders.push(order);
+        
+        // Remove duplicates by orderNumber
+        orders = Array.from(new Map(orders.map(o => [o.orderNumber, o])).values());
+        
+        // Save back to localStorage
+        localStorage.setItem('orders', JSON.stringify(orders));
+        console.log('Order saved to history:', order);
+    }
+
     function clearCheckoutData() {
         localStorage.removeItem('cart');
         localStorage.removeItem('orderSummary');
@@ -231,8 +245,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Phone validation (basic Russian phone format)
         const phone = document.getElementById('phone').value;
-        if (!/^[\d\s\-\+\(\)]{11,}$/.test(phone.replace(/[\s\-\+\(\)]/g, ''))) {
-            alert('Пожалуйста, введите корректный номер телефона (минимум 11 цифр)');
+        if (!/^\+?\d{10,}$/.test(phone.replace(/[\s\-\(\)]/g, ''))) {
+            alert('Пожалуйста, введите корректный номер телефона (минимум 10 цифр)');
             document.getElementById('phone').focus();
             return false;
         }
@@ -272,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return {
             ...orderSummary,
             orderNumber: 'ORD-' + now.getTime().toString().slice(-6),
-            status: paymentMethod === 'card' ? 'Оплачено' : 'Ожидает оплаты',
+            status: paymentMethod === 'card' ? 'Оплачено' : 'Оплата при получении',
             date: now.toISOString(),
             paymentMethod,
             customer: {
@@ -280,7 +294,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 phone: document.getElementById('phone').value.trim(),
                 email: document.getElementById('email').value.trim(),
                 city: document.getElementById('city').value,
-                address: document.getElementById('address').value.trim()
+                address: document.getElementById('address').value.trim(),
+                deliveryDate: document.getElementById('deliveryDate').value
             },
             paymentAmount: orderSummary.total * (paymentMethod === 'cod' ? 1.02 : 1)
         };
@@ -303,75 +318,6 @@ document.addEventListener('DOMContentLoaded', function() {
             throw error;
         }
     }
-
-    document.addEventListener('DOMContentLoaded', async function() {
-        const orderList = document.getElementById('orderList');
-        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-        
-        if (userData.username) {
-            document.getElementById('displayUsername').textContent = userData.username;
-        }
-    
-        // Load orders from orders.json and localStorage
-        let orders = [];
-        try {
-            // Load from orders.json
-            const response = await fetch('../buyer/data/orders.json');
-            if (!response.ok) throw new Error('Failed to load orders.json');
-            const jsonOrders = await response.json();
-            
-            // Load from localStorage
-            const localOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-            
-            // Combine orders, ensuring no duplicates by orderNumber
-            const allOrders = [...jsonOrders, ...localOrders];
-            orders = Array.from(new Map(allOrders.map(o => [o.orderNumber, o])).values());
-        } catch (e) {
-            console.error('Error loading orders:', e);
-            // Fallback to localStorage only
-            orders = JSON.parse(localStorage.getItem('orders') || '[]');
-        }
-    
-        if (orders.length === 0) {
-            orderList.innerHTML = '<p>Нет заказов.</p>';
-            return;
-        }
-    
-        orderList.innerHTML = orders.map(order => `
-            <div class="order-card">
-                <div class="order-header">
-                    <div class="order-meta">
-                        <span class="order-number">Заказ #${order.orderNumber}</span>
-                        <span class="order-date">${new Date(order.date).toLocaleDateString('ru-RU')}</span>
-                    </div>
-                    <div class="order-status ${order.status === 'Отменен' ? 'cancelled' : ''}">
-                        ${order.status}
-                    </div>
-                </div>
-                <div class="order-details">
-                    <h3>Детали заказа</h3>
-                    <p><strong>Покупатель:</strong> ${order.customer.fullName}</p>
-                    <p><strong>Email:</strong> ${order.customer.email}</p>
-                    <p><strong>Телефон:</strong> ${order.customer.phone}</p>
-                    <p><strong>Город:</strong> ${order.customer.city}</p>
-                    <p><strong>Адрес:</strong> ${order.customer.address}</p>
-                    <p><strong>Дата доставки:</strong> ${new Date(order.date).toLocaleDateString('ru-RU')}</p>
-                    <p><strong>Сумма:</strong> ${order.paymentAmount.toLocaleString('ru-RU')} ₽</p>
-                    <h4>Товары:</h4>
-                    <ul>
-                        ${order.items.map(item => `
-                            <li>${item.name} (x${item.quantity}) - ${(item.price * item.quantity).toLocaleString('ru-RU')} ₽</li>
-                        `).join('')}
-                    </ul>
-                </div>
-            </div>
-        `).join('');
-    
-        document.querySelector('.logout-btn').addEventListener('click', function() {
-            localStorage.removeItem('userData');
-            window.location.href = '../../auth/index.html';
-        });
-    });
 
     function updateCodPaymentDetails() {
         if (!paymentAmount || !qrCode) return;
@@ -436,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         await new Promise(resolve => setTimeout(resolve, 500));
-        return cityDistances[city] || 0;
+        return cityDistances[city] || 1000; // Default distance for unknown cities
     }
 
     function updateShippingCost() {
@@ -444,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const baseShipping = orderSummary.items.reduce(
             (total, item) => total + (item.weight * item.quantity * 100), 0);
-        const distanceCost = currentDistance * 15;
+        const distanceCost = currentDistance * 0.15;
         
         orderSummary.shipping = Math.max(baseShipping + distanceCost, 1000);
         orderSummary.total = orderSummary.subtotal + orderSummary.shipping;

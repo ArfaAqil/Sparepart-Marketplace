@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async function() {
-    const orderList = document.getElementById('orderList');
+    const shippingList = document.getElementById('shippingList');
     const cartCounter = document.getElementById('cartCounter');
     const userData = JSON.parse(localStorage.getItem('userData') || {});
 
@@ -17,14 +17,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('displayUsername').textContent = userData.username;
     }
 
-    // Valid status values for order history
-    const validStatuses = [
-        'Ожидает оплаты',
-        'Оплачено',
-        'Оплата при получении',
-        'В обработке',
-        'Отменен'
-    ];
+    // Valid status values for shipping
+    const validStatuses = ['Отправлено', 'Доставлено'];
 
     // Normalize status
     function normalizeStatus(status) {
@@ -34,15 +28,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
         const normalized = status.trim().toLowerCase();
         const statusMap = {
-            'ожидает оплаты': 'Ожидает оплаты',
-            'оплачено': 'Оплачено',
-            'оплата при получении': 'Оплата при получении',
-            'в обработке': 'В обработке',
-            'отменен': 'Отменен'
+            'отправлено': 'Отправлено',
+            'доставлено': 'Доставлено'
         };
         const result = statusMap[normalized];
         if (!result) {
-            console.warn(`Status "${status}" is not valid for order history, skipping order`);
+            console.warn(`Status "${status}" is not valid for shipping, skipping order`);
             return null;
         }
         return result;
@@ -71,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             }))
             .filter(order => order.status !== null);
         
-        // Combine and deduplicate orders
+        // Merge orders, prioritize localStorage for duplicates
         const allOrders = [...jsonOrders, ...localOrders];
         orders = Array.from(new Map(allOrders.map(o => [o.orderNumber, o])).values())
             .filter(order => validStatuses.includes(order.status));
@@ -91,10 +82,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     if (orders.length === 0) {
-        orderList.innerHTML = `
+        shippingList.innerHTML = `
             <div class="empty-orders">
                 <i class="fas fa-box-open"></i>
-                <p>У вас пока нет заказов</p>
+                <p>Нет заказов в доставке</p>
                 <a href="../index.html" class="back-btn">Вернуться в каталог</a>
             </div>
         `;
@@ -110,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     // Render orders with detailed information
-    orderList.innerHTML = orders.map(order => `
+    shippingList.innerHTML = orders.map(order => `
         <div class="order-card">
             <div class="order-header" onclick="toggleOrderDetails(this)">
                 <div class="order-meta">
@@ -155,6 +146,9 @@ document.addEventListener('DOMContentLoaded', async function() {
                         <p><strong>Адрес:</strong> ${order.customer.city}, ${order.customer.address}</p>
                         <p><strong>Дата доставки:</strong> ${formatDate(order.deliveryDate)}</p>
                         <p><strong>Способ оплаты:</strong> ${getPaymentMethodName(order.paymentMethod)}</p>
+                        ${order.trackingNumber ? `
+                            <p><strong>Номер отслеживания:</strong> ${order.trackingNumber}</p>
+                        ` : ''}
                     </div>
                     
                     <div class="order-info-section">
@@ -167,11 +161,14 @@ document.addEventListener('DOMContentLoaded', async function() {
                     </div>
                 </div>
                 
+                ${order.sellerNotes ? `
+                    <div class="order-notes">
+                        <h3>Примечания продавца</h3>
+                        <p>${order.sellerNotes}</p>
+                    </div>
+                ` : ''}
+                
                 <div class="order-actions">
-                    <button class="btn cancel-order-btn" data-order="${order.orderNumber}" 
-                        ${order.status === 'Отменен' || order.status === 'В обработке' ? 'disabled' : ''}>
-                        ${order.status === 'Отменен' ? 'Заказ отменен' : 'Отменить заказ'}
-                    </button>
                     <button class="btn delete-order-btn" data-order="${order.orderNumber}">
                         Удалить заказ
                     </button>
@@ -184,13 +181,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     `).join('');
 
     // Add event listeners
-    orderList.addEventListener('click', function(e) {
+    shippingList.addEventListener('click', function(e) {
         const orderId = e.target.dataset.order;
         if (!orderId) return;
         
-        if (e.target.classList.contains('cancel-order-btn')) {
-            cancelOrder(orderId);
-        } else if (e.target.classList.contains('delete-order-btn')) {
+        if (e.target.classList.contains('delete-order-btn')) {
             deleteOrder(orderId);
         }
     });
@@ -212,33 +207,14 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     function getStatusClass(status) {
         const statusClasses = {
-            'Ожидает оплаты': 'pending',
-            'Оплачено': 'paid',
-            'Оплата при получении': 'cod',
-            'В обработке': 'processing',
-            'Отменен': 'cancelled'
+            'Отправлено': 'shipped',
+            'Доставлено': 'delivered'
         };
         return statusClasses[status] || '';
     }
 
     function getPaymentMethodName(method) {
         return method === 'card' ? 'Картой онлайн' : 'Наложенный платеж (при получении)';
-    }
-
-    function cancelOrder(orderId) {
-        if (confirm('Вы уверены, что хотите отменить этот заказ?')) {
-            try {
-                let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-                const updatedOrders = orders.map(order => 
-                    order.orderNumber === orderId ? { ...order, status: 'Отменен' } : order
-                );
-                localStorage.setItem('orders', JSON.stringify(updatedOrders));
-                window.location.reload();
-            } catch (e) {
-                console.error('Error canceling order:', e);
-                alert('Ошибка при отмене заказа');
-            }
-        }
     }
 
     function deleteOrder(orderId) {

@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', async function() {
-    const orderList = document.getElementById('orderList');
-    const exportExcelBtn = document.getElementById('exportExcelBtn');
-    const refreshOrdersBtn = document.getElementById('refreshOrdersBtn');
+    const shippingList = document.getElementById('shippingList');
+    const refreshShippingBtn = document.getElementById('refreshShippingBtn');
     const statusFilter = document.getElementById('statusFilter');
     const dateFilter = document.getElementById('dateFilter');
     const searchFilter = document.getElementById('searchFilter');
@@ -11,32 +10,25 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('displayUsername').textContent = userData.username;
     }
 
-    // Valid status values for order page (exclude Отправлено and Доставлено)
-    const validStatuses = [
-        'Ожидает оплаты',
-        'Оплачено',
-        'Оплата при получении',
-        'В обработке',
-        'Отменен'
-    ];
+    // Valid status values for shipping
+    const validStatuses = ['Отправлено', 'Доставлено'];
 
     // Normalize status
     function normalizeStatus(status) {
         if (!status || typeof status !== 'string') {
-            console.warn('Invalid status, using default: Ожидает оплаты', status);
-            return 'Ожидает оплаты';
+            console.warn('Invalid or missing status, skipping order:', status);
+            return null; // Return null for invalid status to exclude from rendering
         }
         const normalized = status.trim().toLowerCase();
         const statusMap = {
-            'ожидает оплаты': 'Ожидает оплаты',
-            'оплачено': 'Оплачено',
-            'в обработке': 'В обработке',
             'отправлено': 'Отправлено',
-            'доставлено': 'Доставлено',
-            'отменен': 'Отменен',
-            'оплата при получении': 'Оплата при получении'
+            'доставлено': 'Доставлено'
         };
-        const result = statusMap[normalized] || 'Ожидает оплаты';
+        const result = statusMap[normalized];
+        if (!result) {
+            console.warn(`Status "${status}" is not valid for shipping, skipping order`);
+            return null;
+        }
         console.log(`Normalized status: "${status}" -> "${result}"`);
         return result;
     }
@@ -49,30 +41,40 @@ document.addEventListener('DOMContentLoaded', async function() {
             if (!response.ok) throw new Error('Failed to load orders.json');
             let jsonOrders = await response.json();
             
-            // Normalize statuses
-            jsonOrders = jsonOrders.map(order => ({
-                ...order,
-                status: normalizeStatus(order.status)
-            }));
+            // Normalize statuses and filter invalid ones
+            jsonOrders = jsonOrders
+                .map(order => ({
+                    ...order,
+                    status: normalizeStatus(order.status)
+                }))
+                .filter(order => order.status !== null);
             
             let localOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-            localOrders = localOrders.map(order => ({
-                ...order,
-                status: normalizeStatus(order.status)
-            }));
+            localOrders = localOrders
+                .map(order => ({
+                    ...order,
+                    status: normalizeStatus(order.status)
+                }))
+                .filter(order => order.status !== null);
             
+            // Merge orders, prioritize localStorage for duplicates
             const allOrders = [...jsonOrders, ...localOrders];
-            orders = Array.from(new Map(allOrders.map(o => [o.orderNumber, o])).values());
-            console.log('Orders loaded:', orders);
+            orders = Array.from(new Map(allOrders.map(o => [o.orderNumber, o])).values())
+                .filter(order => validStatuses.includes(order.status));
+            
+            console.log('Shipping orders loaded:', orders);
             renderOrders(orders);
         } catch (e) {
             console.error('Error loading orders:', e);
             let localOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-            localOrders = localOrders.map(order => ({
-                ...order,
-                status: normalizeStatus(order.status)
-            }));
-            orders = localOrders;
+            localOrders = localOrders
+                .map(order => ({
+                    ...order,
+                    status: normalizeStatus(order.status)
+                }))
+                .filter(order => order.status !== null);
+            orders = localOrders.filter(order => validStatuses.includes(order.status));
+            console.log('Fallback to local orders:', orders);
             renderOrders(orders);
         }
     }
@@ -86,15 +88,13 @@ document.addEventListener('DOMContentLoaded', async function() {
         return 'https://via.placeholder.com/80?text=No+Image';
     }
 
-    // Render orders with filtering (exclude Отправлено and Доставлено)
+    // Render orders with filtering
     function renderOrders(ordersToRender) {
         const status = statusFilter.value;
         const date = dateFilter.value;
         const search = searchFilter.value.toLowerCase();
         
         const filteredOrders = ordersToRender.filter(order => {
-            // Only include orders with valid statuses for this page
-            if (!validStatuses.includes(order.status)) return false;
             const matchesStatus = status === 'all' || order.status === status;
             const matchesDate = !date || new Date(order.date).toISOString().split('T')[0] === date;
             const matchesSearch = !search || 
@@ -105,17 +105,17 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
 
         if (filteredOrders.length === 0) {
-            orderList.innerHTML = `
+            shippingList.innerHTML = `
                 <div class="empty-orders">
                     <i class="fas fa-box-open"></i>
-                    <p>Нет заказов по выбранным критериям</p>
+                    <p>Нет заказов в доставке</p>
                 </div>
             `;
             return;
         }
 
-        orderList.innerHTML = filteredOrders.map(order => {
-            console.log(`Rendering order #${order.orderNumber}, status: ${order.status}`);
+        shippingList.innerHTML = filteredOrders.map(order => {
+            console.log(`Rendering shipping order #${order.orderNumber}, status: ${order.status}`);
             return `
                 <div class="order-card">
                     <div class="order-header" onclick="toggleOrderDetails(this)">
@@ -174,22 +174,24 @@ document.addEventListener('DOMContentLoaded', async function() {
                             `).join('')}
                         </div>
                         
+                        ${order.trackingNumber ? `
+                            <div class="order-tracking">
+                                <h3>Информация об отслеживании</h3>
+                                <p><strong>Номер отслеживания:</strong> ${order.trackingNumber}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${order.sellerNotes ? `
+                            <div class="order-notes">
+                                <h3>Примечания продавца</h3>
+                                <p>${order.sellerNotes}</p>
+                            </div>
+                        ` : ''}
+                        
                         <div class="order-actions">
-                            ${order.status === 'Ожидает оплаты' ? `
-                                <button class="btn cancel-order-btn" data-order="${order.orderNumber}">
-                                    Отменить заказ
-                                </button>
-                            ` : ''}
-                            
-                            ${['Оплачено', 'Оплата при получении'].includes(order.status) ? `
-                                <a href="../process-order/index.html?orderNumber=${order.orderNumber}" class="btn process-order-btn">
-                                    Начать обработку
-                                </a>
-                            ` : ''}
-                            
-                            ${order.status === 'В обработке' ? `
-                                <a href="../process-order/index.html?orderNumber=${order.orderNumber}" class="btn ship-order-btn">
-                                    Отправить заказ
+                            ${order.status === 'Отправлено' ? `
+                                <a href="../process-order/index.html?orderNumber=${order.orderNumber}" class="btn complete-order-btn">
+                                    Подтвердить доставку
                                 </a>
                             ` : ''}
                             
@@ -220,11 +222,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     function getStatusClass(status) {
         const statusClasses = {
-            'Ожидает оплаты': 'pending',
-            'Оплачено': 'paid',
-            'В обработке': 'processing',
-            'Отменен': 'cancelled',
-            'Оплата при получении': 'cod'
+            'Отправлено': 'shipped',
+            'Доставлено': 'delivered'
         };
         return statusClasses[status] || 'unknown';
     }
@@ -233,30 +232,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         return method === 'card' ? 'Картой онлайн' : 'Наложенный платеж (при получении)';
     }
 
-    function updateOrderStatus(orderNumber, newStatus) {
-        try {
-            let localOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-            const updatedOrders = localOrders.map(order => 
-                order.orderNumber === orderNumber ? { ...order, status: newStatus } : order
-            );
-            localStorage.setItem('orders', JSON.stringify(updatedOrders));
-            loadOrders();
-        } catch (e) {
-            console.error('Error updating order status:', e);
-            alert('Ошибка при обновлении статуса заказа');
-        }
-    }
-
     // Event listeners
-    orderList.addEventListener('click', function(e) {
+    shippingList.addEventListener('click', function(e) {
         const orderId = e.target.dataset.order;
         if (!orderId) return;
         
-        if (e.target.classList.contains('cancel-order-btn')) {
-            if (confirm('Вы уверены, что хотите отменить этот заказ?')) {
-                updateOrderStatus(orderId, 'Отменен');
-            }
-        } else if (e.target.classList.contains('delete-order-btn')) {
+        if (e.target.classList.contains('delete-order-btn')) {
             if (confirm('Удалить запись о заказе из системы?')) {
                 try {
                     let localOrders = JSON.parse(localStorage.getItem('orders') || '[]');
@@ -271,30 +252,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 
-    exportExcelBtn.addEventListener('click', () => {
-        // Include ALL orders in Excel export, even those in shipping
-        const data = orders.map(order => ({
-            'Номер заказа': order.orderNumber,
-            'Дата': formatDate(order.date),
-            'Статус': order.status,
-            'Клиент': order.customer.fullName,
-            'Телефон': order.customer.phone,
-            'Город': order.customer.city,
-            'Адрес': order.customer.address,
-            'Сумма': order.paymentAmount,
-            'Товары': order.items.map(item => `${item.name} (${item.quantity} × ${item.price} ₽)`).join('; '),
-            'Способ оплаты': getPaymentMethodName(order.paymentMethod),
-            'Номер отслеживания': order.trackingNumber || '',
-            'Примечания продавца': order.sellerNotes || ''
-        }));
-
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Заказы');
-        XLSX.writeFile(wb, `orders_${new Date().toISOString().split('T')[0]}.xlsx`);
-    });
-
-    refreshOrdersBtn.addEventListener('click', () => {
+    refreshShippingBtn.addEventListener('click', () => {
         location.reload();
     });
 

@@ -41,7 +41,7 @@
     },
     {
         "orderNumber": "ORD-123457",
-        "status": "Ожидает оплаты",
+        "status": "Оплата при получении",
         "date": "2025-04-26T15:45:00.000Z",
         "paymentMethod": "cod",
         "paymentAmount": 27540,

@@ -1,8 +1,8 @@
-.order-history-main {
+.shipping-main {
     padding: 2rem 0;
 }
 
-.order-list {
+.shipping-list {
     display: grid;
     gap: 1.5rem;
     margin-top: 2rem;
@@ -52,29 +52,14 @@
     font-weight: 500;
 }
 
-.order-status.paid {
-    background-color: #e3f7e8;
-    color: #2e7d32;
-}
-
-.order-status.pending {
-    background-color: #fff8e1;
-    color: #ff8f00;
-}
-
-.order-status.processing {
-    background-color: #bbdefb;
-    color: #1976d2;
-}
-
-.order-status.cancelled {
-    background-color: #ffebee;
-    color: #c62828;
-}
-
-.order-status.cod {
-    background-color: #f3e5f5;
+.order-status.shipped {
+    background-color: #e1bee7;
     color: #7b1fa2;
+}
+
+.order-status.delivered {
+    background-color: #e3f2fd;
+    color: #1565c0;
 }
 
 .order-summary {
@@ -182,6 +167,23 @@
     margin: 8px 0;
 }
 
+.order-notes {
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 6px;
+    margin: 1rem 0;
+}
+
+.order-notes h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.order-notes p {
+    margin: 8px 0;
+}
+
 .order-actions {
     display: flex;
     gap: 0.5rem;
@@ -199,17 +201,6 @@
     font-size: 0.9rem;
     text-decoration: none;
     text-align: center;
-}
-
-.cancel-order-btn {
-    background: #FFC107;
-    color: #000;
-}
-
-.cancel-order-btn:disabled {
-    background: #e0e0e0;
-    color: #666;
-    cursor: not-allowed;
 }
 
 .delete-order-btn {
@@ -248,7 +239,7 @@
     text-decoration: none;
 }
 
-.home-btn, .shipping-btn {
+.home-btn, .orders-btn {
     color: white;
     text-decoration: none;
     padding: 8px 15px;
@@ -259,7 +250,7 @@
     transition: background-color 0.3s;
 }
 
-.home-btn:hover, .shipping-btn:hover {
+.home-btn:hover, .orders-btn:hover {
     background-color: #34495e;
 }
 

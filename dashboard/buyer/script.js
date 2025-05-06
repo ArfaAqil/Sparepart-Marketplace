@@ -22,40 +22,110 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('displayUsername').textContent = userData.username;
     }
 
-    // Load product data from JSON
+    // Normalize and validate product structure
+    function normalizeProduct(product) {
+        if (!product || typeof product !== 'object') {
+            console.warn('Invalid product: Not an object', product);
+            return null;
+        }
+
+        const defaultProduct = {
+            id: String(product.id || Date.now()),
+            name: product.name || 'Unnamed Product',
+            brand: product.brand || 'Unknown',
+            model: product.model || 'Unknown',
+            year: parseInt(product.year) || 2023,
+            price: parseFloat(product.price) || 0,
+            weight: parseFloat(product.weight) || 0,
+            category: product.category || 'Тормоза',
+            condition: product.condition || 'new',
+            inStock: product.inStock !== undefined ? product.inStock : true,
+            hasWarranty: product.hasWarranty !== undefined ? product.hasWarranty : false,
+            sellerRating: parseFloat(product.sellerRating) || 4.0,
+            vin: product.vin || `VIN${Date.now()}`,
+            description: product.description || 'No description',
+            images: Array.isArray(product.images) ? product.images : (product.images ? [product.images] : ['../../Images/placeholder.jpg']),
+            specifications: {
+                material: product.specifications?.material || 'Unknown',
+                compatibility: product.specifications?.compatibility || 'Unknown',
+                warranty: product.specifications?.warranty || 'None'
+            }
+        };
+
+        // Log warnings for missing or invalid properties
+        const requiredProps = ['id', 'name', 'brand', 'model', 'year', 'price', 'weight', 'category', 'condition', 'inStock', 'hasWarranty', 'sellerRating', 'vin', 'description', 'images'];
+        requiredProps.forEach(prop => {
+            if (!(prop in product)) {
+                console.warn(`Product ID ${product.id}: Missing ${prop}, using default: ${defaultProduct[prop]}`);
+            }
+        });
+
+        if (!product.specifications || typeof product.specifications !== 'object') {
+            console.warn(`Product ID ${product.id}: Invalid specifications, using default`);
+        } else {
+            ['material', 'compatibility', 'warranty'].forEach(spec => {
+                if (!(spec in product.specifications)) {
+                    console.warn(`Product ID ${product.id}: Missing specifications.${spec}, using default: ${defaultProduct.specifications[spec]}`);
+                }
+            });
+        }
+
+        if (!Array.isArray(product.images)) {
+            console.warn(`Product ID ${product.id}: images is not an array, converted to: ${defaultProduct.images}`);
+        }
+
+        return defaultProduct;
+    }
+
+    // Load product data
     let products = [];
     try {
         const response = await fetch('data/products.json');
-        if (!response.ok) throw new Error('Failed to load products');
-        products = await response.json();
-        console.log('Products loaded:', products);
+        if (!response.ok) throw new Error('Failed to load products.json');
+        let jsonProducts = await response.json();
+        console.log('Raw products.json:', jsonProducts);
+        // Normalize products and ensure IDs are strings
+        jsonProducts = jsonProducts.map(p => normalizeProduct({ ...p, id: String(p.id) })).filter(p => p !== null);
+        const localProducts = JSON.parse(localStorage.getItem('products') || '[]')
+            .map(p => normalizeProduct({ ...p, id: String(p.id) }))
+            .filter(p => p !== null);
+        const allProducts = [...jsonProducts, ...localProducts];
+        // Remove duplicates based on ID
+        products = Array.from(new Map(allProducts.map(p => [p.id, p])).values());
+        console.log('Normalized products loaded:', products);
     } catch (error) {
         console.error('Error loading products:', error);
-        // Fallback minimal product data
-        products = [
-            {
-                id: 1,
-                name: "Тормозные колодки Toyota Corolla",
-                brand: "Toyota",
-                model: "Corolla",
-                year: 2020,
-                price: 12500,
-                weight: 1.5,
-                category: "Тормоза",
-                condition: "new",
-                inStock: true,
-                hasWarranty: true,
-                sellerRating: 4.5,
-                vin: "TOYOTA2020COROLABRAK",
-                description: "Высококачественные тормозные колодки для Toyota Corolla",
-                images: ["../../Images/Тормозные колодки Toyota Corolla/11.webp"],
-                specifications: {
-                    material: "Керамика",
-                    compatibility: "Toyota Corolla 2015-2023",
-                    warranty: "2 года"
+        let localProducts = JSON.parse(localStorage.getItem('products') || '[]')
+            .map(p => normalizeProduct({ ...p, id: String(p.id) }))
+            .filter(p => p !== null);
+        products = localProducts;
+        if (products.length === 0) {
+            products = [
+                {
+                    id: "1",
+                    name: "Тормозные колодки Toyota Corolla",
+                    brand: "Toyota",
+                    model: "Corolla",
+                    year: 2020,
+                    price: 12500,
+                    weight: 1.5,
+                    category: "Тормоза",
+                    condition: "new",
+                    inStock: true,
+                    hasWarranty: true,
+                    sellerRating: 4.5,
+                    vin: "TOYOTA2020COROLABRAK",
+                    description: "Высококачественные тормозные колодки для Toyota Corolla",
+                    images: ["../../Images/Тормозные колодки Toyota Corolla/11.webp"],
+                    specifications: {
+                        material: "Керамика",
+                        compatibility: "Toyota Corolla 2015-2023",
+                        warranty: "2 года"
+                    }
                 }
-            }
-        ];
+            ];
+        }
+        console.log('Fallback products:', products);
     }
 
     // Initialize cart
@@ -85,13 +155,39 @@ document.addEventListener('DOMContentLoaded', async function() {
     const resetFilter = document.querySelector('.reset-filter');
     const stars = document.querySelectorAll('.stars span');
 
-    // Brand-Model mapping
-    const brandModels = {
-        'Toyota': ['Corolla', 'Camry', 'RAV4'],
-        'Lada': ['Granta', 'Vesta', 'Niva'],
-        'Honda': ['Civic', 'Accord', 'CR-V'],
-        'BMW': ['X5', '3 Series', '5 Series']
-    };
+    // Dynamically populate brand and model filters
+    const brands = [...new Set(products.map(p => p.brand))].sort();
+    const brandModels = {};
+    brands.forEach(brand => {
+        brandModels[brand] = [...new Set(products.filter(p => p.brand === brand).map(p => p.model))].sort();
+    });
+
+    brandFilter.innerHTML = '<option value="">Все марки</option>' + 
+        brands.map(brand => `<option value="${brand}">${brand}</option>`).join('');
+
+    // Populate category filters
+    const categories = [...new Set(products.map(p => p.category))].sort();
+    const categoryCheckboxes = document.querySelectorAll('.filter-group input[type="checkbox"][id^="category"]');
+    categoryCheckboxes.forEach(checkbox => {
+        if (!categories.includes(checkbox.nextElementSibling.textContent)) {
+            checkbox.parentElement.style.display = 'none';
+        }
+    });
+    categories.forEach(category => {
+        let checkbox = document.querySelector(`#category${category.replace(/\s/g, '')}`);
+        if (!checkbox) {
+            const filterGroup = document.querySelector('.filter-group:nth-child(6)');
+            const newCheckbox = document.createElement('div');
+            newCheckbox.className = 'filter-checkbox';
+            newCheckbox.innerHTML = `
+                <input type="checkbox" id="category${category.replace(/\s/g, '')}" checked>
+                <label for="category${category.replace(/\s/g, '')}">${category}</label>
+            `;
+            filterGroup.appendChild(newCheckbox);
+        } else {
+            checkbox.parentElement.style.display = 'flex';
+        }
+    });
 
     // Current image index for modal carousel
     let currentImageIndex = 0;
@@ -110,6 +206,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     overlay.addEventListener('click', () => {
         filterSidebar.classList.remove('active');
         overlay.classList.remove('active');
+        productModal.classList.remove('active');
     });
 
     // Price slider
@@ -120,7 +217,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Brand-Model relationship
     brandFilter.addEventListener('change', function() {
         modelFilter.innerHTML = '<option value="">Все модели</option>';
-        
         if (this.value) {
             modelFilter.disabled = false;
             brandModels[this.value].forEach(model => {
@@ -134,9 +230,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Star rating selection
     stars.forEach(star => {
         star.addEventListener('click', function() {
-            const rating = parseInt(this.dataset.rating);
-            
-            // Toggle active class
             stars.forEach(s => s.classList.remove('active'));
             this.classList.add('active');
         });
@@ -189,9 +282,15 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.querySelectorAll('.product-card').forEach(card => {
             card.addEventListener('click', function(e) {
                 if (!e.target.classList.contains('add-to-cart')) {
-                    const productId = parseInt(this.dataset.id);
+                    const productId = this.dataset.id;
+                    console.log('Product card clicked, ID:', productId);
                     const product = products.find(p => p.id === productId);
-                    showProductModal(product);
+                    if (product) {
+                        console.log('Product found:', product);
+                        showProductModal(product);
+                    } else {
+                        console.error('Product not found for ID:', productId);
+                    }
                 }
             });
         });
@@ -200,25 +299,29 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.querySelectorAll('.add-to-cart').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.stopPropagation();
-                const productId = parseInt(this.closest('.product-card').dataset.id);
+                const productId = this.closest('.product-card').dataset.id;
+                console.log('Add to cart clicked, ID:', productId);
                 const product = products.find(p => p.id === productId);
-                addToCart(product);
+                if (product) {
+                    console.log('Product found for cart:', product);
+                    addToCart(product);
+                } else {
+                    console.error('Product not found for cart, ID:', productId);
+                }
             });
         });
 
-        // Detect image orientation after render
+        // Detect image orientation
         setTimeout(() => {
             productsToRender.forEach(product => {
                 const imgContainer = document.getElementById(`productImage-${product.id}`);
                 if (imgContainer) {
                     const img = imgContainer.querySelector('img');
-                    
                     img.onload = function() {
                         if (this.naturalHeight > this.naturalWidth) {
                             imgContainer.classList.add('portrait');
                         }
                     };
-                    
                     if (img.complete) img.onload();
                 }
             });
@@ -237,8 +340,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                              class="main-image"
                              onerror="this.onerror=null;this.src='https://via.placeholder.com/800x450?text=No+Image'">
                     </div>
-                    <button class="carousel-prev">&lt;</button>
-                    <button class="carousel-next">&gt;</button>
+                    <button class="carousel-prev"><</button>
+                    <button class="carousel-next">></button>
                 </div>
                 <div class="thumbnail-container">
                     ${product.images.map((img, index) => `
@@ -295,24 +398,28 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         thumbnails.forEach(thumb => {
             thumb.addEventListener('click', function() {
+                console.log('Thumbnail clicked, index:', this.dataset.index);
                 updateMainImage(parseInt(this.dataset.index));
             });
         });
 
         prevButton.addEventListener('click', function(e) {
             e.stopPropagation();
+            console.log('Previous button clicked');
             const newIndex = (currentImageIndex - 1 + product.images.length) % product.images.length;
             updateMainImage(newIndex);
         });
 
         nextButton.addEventListener('click', function(e) {
             e.stopPropagation();
+            console.log('Next button clicked');
             const newIndex = (currentImageIndex + 1) % product.images.length;
             updateMainImage(newIndex);
         });
 
         // Add event listener to modal add to cart button
         document.querySelector('.modal-add-to-cart').addEventListener('click', function() {
+            console.log('Modal add to cart clicked, ID:', product.id);
             addToCart(product);
             productModal.classList.remove('active');
             overlay.classList.remove('active');
@@ -320,21 +427,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         productModal.classList.add('active');
         overlay.classList.add('active');
+        console.log('Product modal shown for product:', product.name);
     }
 
     // Close modal
     closeModal.addEventListener('click', function() {
-        productModal.classList.remove('active');
-        overlay.classList.remove('active');
-    });
-
-    overlay.addEventListener('click', function() {
+        console.log('Product modal closed');
         productModal.classList.remove('active');
         overlay.classList.remove('active');
     });
 
     // Add to cart function
     function addToCart(product) {
+        console.log('Adding to cart:', product);
         const existingItem = cart.find(item => item.id === product.id);
         
         if (existingItem) {
@@ -385,59 +490,32 @@ document.addEventListener('DOMContentLoaded', async function() {
         const searchTerm = (searchInput.value || productSearch.value).toLowerCase();
         const selectedBrand = brandFilter.value;
         const selectedModel = modelFilter.value;
-        const minYearValue = parseInt(minYear.value) || 1990;
-        const maxYearValue = parseInt(maxYear.value) || 2023;
+        const minYearValue = parseInt(minYear.value) || 1900;
+        const maxYearValue = parseInt(maxYear.value) || 2025;
         const maxPriceValue = parseInt(priceSlider.value) || 100000;
         const showNew = newCondition.checked;
         const showUsed = usedCondition.checked;
-        const showBrakes = categoryBrakes.checked;
-        const showEngine = categoryEngine.checked;
-        const showFilter = categoryFilter.checked;
-        const showLubrication = categoryLubrication.checked;
-        const showSuspension = categorySuspension.checked;
         const onlyInStock = inStockOnly.checked;
         const onlyWithWarranty = hasWarranty.checked;
         const activeStar = document.querySelector('.stars span.active');
         const minRating = activeStar ? parseInt(activeStar.dataset.rating) : 0;
         
         const filtered = products.filter(product => {
-            // Search term (name or VIN)
             const matchesSearch = searchTerm 
                 ? product.name.toLowerCase().includes(searchTerm) || 
                   product.vin.toLowerCase().includes(searchTerm)
                 : true;
-            
-            // Brand and model
             const matchesBrand = selectedBrand ? product.brand === selectedBrand : true;
             const matchesModel = selectedModel ? product.model === selectedModel : true;
-            
-            // Year range
             const matchesYear = product.year >= minYearValue && product.year <= maxYearValue;
-            
-            // Price
             const matchesPrice = product.price <= maxPriceValue;
-            
-            // Condition
             const matchesCondition = 
                 (showNew && product.condition === 'new') || 
                 (showUsed && product.condition === 'used');
-            
-            // Category
-            const matchesCategory = 
-                (showBrakes && product.category === 'Тормоза') ||
-                (showEngine && product.category === 'Двигатель') ||
-                (showFilter && product.category === 'Фильтры') ||
-                (showLubrication && product.category === 'Смазки') ||
-                (showSuspension && product.category === 'Подвеска');
-                
-            
-            // Availability
+            const matchesCategory = Array.from(document.querySelectorAll('.filter-group input[type="checkbox"][id^="category"]:checked'))
+                .some(checkbox => checkbox.nextElementSibling.textContent === product.category);
             const matchesAvailability = onlyInStock ? product.inStock : true;
-            
-            // Warranty
             const matchesWarranty = onlyWithWarranty ? product.hasWarranty : true;
-            
-            // Rating
             const matchesRating = minRating === 0 ? true : product.sellerRating >= minRating;
             
             return matchesSearch && matchesBrand && matchesModel && matchesYear && 
@@ -452,7 +530,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Reset filters
     function resetFilters() {
-        // Reset all input fields
         searchInput.value = '';
         productSearch.value = '';
         brandFilter.value = '';
@@ -464,18 +541,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         maxPrice.textContent = '50000';
         newCondition.checked = true;
         usedCondition.checked = true;
-        categoryBrakes.checked = true;
-        categoryEngine.checked = true;
-        categorySuspension.checked = true;
-        categoryFilter.checked = true;
-        categoryLubrication.checked = true;
+        document.querySelectorAll('.filter-group input[type="checkbox"][id^="category"]').forEach(checkbox => {
+            checkbox.checked = true;
+        });
         inStockOnly.checked = false;
         hasWarranty.checked = false;
-        
-        // Reset star rating
         stars.forEach(star => star.classList.remove('active'));
-        
-        // Render all products
         renderProducts(products);
     }
 

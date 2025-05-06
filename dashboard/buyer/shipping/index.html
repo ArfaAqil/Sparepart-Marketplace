@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>История заказов | Автозапчасти</title>
+    <title>Доставка заказов | Автозапчасти</title>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -14,7 +14,7 @@
             <div class="logo">АВТОЗАПЧАСТИ</div>
             <nav class="user-nav">
                 <a href="../index.html" class="home-btn"><i class="fas fa-home"></i> Главная</a>
-                <a href="../shipping/index.html" class="shipping-btn"><i class="fas fa-truck"></i> Доставка</a>
+                <a href="../order/order-history.html" class="orders-btn"><i class="fas fa-box"></i> История заказов</a>
                 <span class="username">Добро пожаловать, <span id="displayUsername">Покупатель</span></span>
                 <a href="../cart/index.html" class="cart-icon-container">
                     <i class="fas fa-shopping-cart"></i>
@@ -25,12 +25,12 @@
         </div>
     </header>
 
-    <main class="order-history-main">
+    <main class="shipping-main">
         <div class="container">
-            <h1>История заказов</h1>
+            <h1>Доставка заказов</h1>
             
-            <div class="order-list" id="orderList">
-                <!-- Orders will be loaded here by JavaScript -->
+            <div class="shipping-list" id="shippingList">
+                <!-- Shipping orders will be loaded here by JavaScript -->
             </div>
         </div>
     </main>
