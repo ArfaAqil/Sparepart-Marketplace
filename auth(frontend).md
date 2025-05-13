@@ -1,184 +1,257 @@
-# Документация: Модуль аутентификации (`auth`)
+# Документация: Модуль авторизации (`auth`)
 
 ## Обзор
 
-Модуль `auth` отвечает за аутентификацию и регистрацию пользователей в маркетплейсе автозапчастей. Он поддерживает три роли: покупатель, продавец и администратор. Модуль обеспечивает безопасный вход, регистрацию и управление сессиями через `localStorage`.
+Модуль `auth` отвечает за авторизацию и регистрацию пользователей на платформе электронной коммерции автозапчастей. Он предоставляет интерфейс для входа и регистрации пользователей с тремя ролями: **покупатель**, **продавец** и **администратор**. Модуль использует `localStorage` для хранения пользовательских данных и файл `users.json` для начальной загрузки пользователей. Интерфейс реализован на русском языке, адаптивен и использует минималистичный дизайн с акцентом на удобство использования.
 
-## Структура
+```javascript
+// Пример структуры данных пользователя в localStorage
+const userData = {
+    id: 1,
+    username: "buyer1",
+    email: "buyer1@example.com",
+    role: "buyer"
+};
+localStorage.setItem('userData', JSON.stringify(userData));
+```
+
+## Структура директории
 
 ```
 auth/
 ├── data/
-│   └── users.json      # Хранилище данных пользователей
-├── index.html          # Страница входа и регистрации
-├── style.css           # Стили для интерфейса
-└── script.js           # Логика аутентификации
+│   └── users.json    # Данные пользователей
+├── index.html        # Страница авторизации/регистрации
+├── style.css         # Стили для страницы
+└── script.js         # Логика авторизации и регистрации
 ```
 
-### `data/users.json`
+## Основные компоненты
 
-- **Описание**: JSON-файл, содержащий начальные данные пользователей.
-- **Формат**:
+### 1. `index.html` (Страница авторизации/регистрации)
 
-  ```json
-  [
-    {
-      "id": 1,
-      "username": "Покупатель1",
-      "email": "buyer1@example.com",
-      "password": "password123",
-      "role": "buyer"
-    },
-    {
-      "id": 2,
-      "username": "Продавец1",
-      "email": "seller1@example.com",
-      "password": "password123",
-      "role": "seller"
-    },
-    {
-      "id": 3,
-      "username": "Админ1",
-      "email": "admin1@example.com",
-      "password": "password123",
-      "role": "admin",
-      "secretKey": "ADMKEY2025"
+**Описание**: Главная страница модуля, предоставляющая форму для входа или регистрации пользователей с выбором роли.
+
+**Функции**:
+- Выбор роли пользователя: покупатель, продавец или администратор.
+- Форма для ввода email/телефона, пароля и (для администратора) секретного ключа.
+- Переключение между режимами входа и регистрации.
+- Валидация введённых данных (на стороне клиента).
+- Перенаправление на соответствующий дашборд после успешной авторизации/регистрации.
+
+**Основные элементы**:
+- `.role-selector`: Кнопки выбора роли (`buyer`, `seller`, `admin`).
+- `#authForm`: Форма авторизации/регистрации.
+- `#secretKeyGroup`: Поле секретного ключа, отображаемое только для администратора.
+- `#toggleAuthMode`: Ссылка для переключения между входом и регистрацией.
+- `.submit-btn`: Кнопка отправки формы.
+
+**Код**:
+```html
+<div class="auth-card">
+    <h1 class="auth-title">Вход в систему</h1>
+    <div class="role-selector">
+        <button class="role-btn active" data-role="buyer">Покупатель</button>
+        <button class="role-btn" data-role="seller">Продавец</button>
+        <button class="role-btn" data-role="admin">Админ</button>
+    </div>
+    <form id="authForm" class="auth-form">
+        <div class="form-group">
+            <label for="email">Email или телефон</label>
+            <input type="text" id="email" placeholder="example@mail.ru">
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
+        <div class="form-group hidden" id="secretKeyGroup">
+            <label for="secretKey">Секретный ключ</label>
+            <input type="password" id="secretKey">
+        </div>
+        <button type="submit" class="submit-btn">Продолжить</button>
+    </form>
+    <div class="auth-footer">
+        <span id="toggleAuthMode">Зарегистрироваться</span>
+    </div>
+</div>
+```
+
+**Примечание**: 
+- Поле имени пользователя (`username`) добавляется динамически при регистрации.
+- Поле секретного ключа отображается только для роли администратора.
+
+### 2. `script.js` (Логика авторизации/регистрации)
+
+**Описание**: Управляет логикой обработки формы, валидацией данных, загрузкой пользователей и перенаправлением.
+
+**Функции**:
+- **Загрузка пользователей**: Из `users.json` и `localStorage` с дедупликацией по email.
+- **Выбор роли**: Переключение активной роли и отображение/скрытие поля секретного ключа.
+- **Переключение режимов**: Динамическое изменение формы для входа или регистрации (добавление/удаление поля имени пользователя).
+- **Валидация**:
+  - Для входа: проверка email, пароля и (для администратора) секретного ключа.
+  - Для регистрации: проверка уникальности email и (для администратора) корректности секретного ключа (`ADMKEY2025`).
+- **Сохранение данных**: Сохранение нового пользователя в `localStorage` и текущей сессии в `userData`.
+- **Перенаправление**: На соответствующий дашборд в зависимости от роли (`buyer`, `seller`, `admin`).
+
+**Код**:
+```javascript
+// Загрузка пользователей
+async function loadUsers() {
+    let users = [];
+    try {
+        const response = await fetch('../auth/data/users.json');
+        if (!response.ok) throw new Error('Failed to load users.json');
+        const jsonUsers = await response.json();
+        const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
+        users = Array.from(new Map([...jsonUsers, ...localUsers].map(u => [u.email, u])).values());
+    } catch (error) {
+        console.error('Error loading users:', error);
+        users = JSON.parse(localStorage.getItem('users') || '[]');
     }
-  ]
-  ```
-- **Примечание**: Данные из `users.json` объединяются с данными в `localStorage`, избегая дублирования по `email`.
+    return users;
+}
 
-### `index.html`
+// Обработка формы
+authForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const role = document.querySelector('.role-btn.active').dataset.role;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const isLogin = authTitle.textContent.includes('Вход');
+    
+    if (isLogin) {
+        const user = users.find(u => u.email === email && u.password === password && u.role === role);
+        if (!user) {
+            alert('Неверный email, пароль или роль');
+            return;
+        }
+        localStorage.setItem('userData', JSON.stringify(user));
+        redirectToDashboard(role);
+    } else {
+        if (users.some(u => u.email === email)) {
+            alert('Этот email уже зарегистрирован');
+            return;
+        }
+        const newUser = { id: users.length + 1, username: document.getElementById('username').value, email, password, role };
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('userData', JSON.stringify(newUser));
+        redirectToDashboard(role);
+    }
+});
+```
 
-- **Описание**: HTML-страница для входа и регистрации.
-- **Ключевые элементы**:
-  - **Переключатель ролей**: Кнопки для выбора роли (`buyer`, `seller`, `admin`).
-  - **Форма аутентификации**: Поля для email/телефона, пароля и секретного ключа (для админа).
-  - **Переключатель режимов**: Ссылка для переключения между входом и регистрацией.
-- **Зависимости**: Подключает `style.css` и `script.js`.
+**Примечание**:
+- Секретный ключ для администратора жёстко закодирован как `ADMKEY2025` для демонстрационных целей.
+- При ошибке загрузки `users.json` используется только `localStorage`.
 
-### `style.css`
+### 3. `data/users.json` (Данные пользователей)
 
-- **Описание**: CSS-файл, определяющий стили для страницы аутентификации.
-- **Основные классы**:
-  - `.auth-header`: Шапка страницы.
-  - `.auth-card`: Контейнер формы.
-  - `.role-btn`: Стили для кнопок выбора роли.
-  - `.form-group`: Стили для полей ввода.
-  - `.submit-btn`: Стили для кнопки отправки формы.
+**Описание**: Файл с начальными данными пользователей для тестирования.
 
-### `script.js`
+**Формат**:
+```json
+[
+    {
+        "id": 1,
+        "username": "buyer1",
+        "email": "buyer1@example.com",
+        "password": "password123",
+        "role": "buyer"
+    },
+    {
+        "id": 2,
+        "username": "admin1",
+        "email": "admin1@example.com",
+        "password": "admin123",
+        "role": "admin",
+        "secretKey": "ADMKEY2025"
+    },
+    {
+        "id": 3,
+        "username": "seller1",
+        "email": "seller1@example.com",
+        "password": "seller123",
+        "role": "seller"
+    }
+]
+```
 
-- **Описание**: JavaScript-файл, реализующий логику аутентификации и регистрации.
-
-- **Основные функции**:
-
-  1. **Загрузка данных пользователей**:
-     - Загружает данные из `users.json` и `localStorage`.
-     - Объединяет данные, исключая дубли по `email`.
-  2. **Переключение ролей**:
-     - Управляет активной ролью через класс `.active` на кнопках `.role-btn`.
-     - Показывает/скрывает поле секретного ключа для роли `admin`.
-  3. **Переключение режимов (вход/регистрация)**:
-     - Динамически изменяет заголовок, текст кнопки и добавляет/удаляет поле имени пользователя.
-  4. **Обработка формы**:
-     - **Вход**:
-       - Проверяет соответствие `email`, `password` и `role`.
-       - Для админа дополнительно проверяет `secretKey`.
-       - Сохраняет данные пользователя в `localStorage` (`userData`).
-     - **Регистрация**:
-       - Проверяет уникальность `email`.
-       - Для админа проверяет `secretKey` (`ADMKEY2025`).
-       - Создаёт нового пользователя и сохраняет в `localStorage`.
-  5. **Перенаправление**:
-     - После успешного входа/регистрации перенаправляет на соответствующую панель:
-       - Покупатель: `dashboard/buyer/index.html`
-       - Продавец: `dashboard/seller/index.html`
-       - Админ: `dashboard/admin/index.html`
-
-- **Код**:
-
-  ```javascript
-  document.addEventListener('DOMContentLoaded', async function() {
-      // Загрузка пользователей
-      let users = [];
-      try {
-          const response = await fetch('../auth/data/users.json');
-          const jsonUsers = await response.json();
-          const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
-          users = Array.from(new Map([...jsonUsers, ...localUsers].map(u => [u.email, u])).values());
-      } catch (error) {
-          console.error('Error loading users:', error);
-          users = JSON.parse(localStorage.getItem('users') || '[]');
-      }
-  
-      // Переключение ролей
-      roleBtns.forEach(btn => {
-          btn.addEventListener('click', function() {
-              roleBtns.forEach(b => b.classList.remove('active'));
-              this.classList.add('active');
-              secretKeyGroup.classList.toggle('hidden', this.dataset.role !== 'admin');
-          });
-      });
-  
-      // Обработка формы
-      authForm.addEventListener('submit', async function(e) {
-          e.preventDefault();
-          const role = document.querySelector('.role-btn.active').dataset.role;
-          const email = document.getElementById('email').value;
-          const password = document.getElementById('password').value;
-          const isLogin = authTitle.textContent.includes('Вход');
-  
-          if (isLogin) {
-              const user = users.find(u => u.email === email && u.password === password && u.role === role);
-              if (!user) {
-                  alert('Неверный email, пароль или роль');
-                  return;
-              }
-              localStorage.setItem('userData', JSON.stringify(user));
-              redirectToDashboard(role);
-          } else {
-              if (users.some(u => u.email === email)) {
-                  alert('Этот email уже зарегистрирован');
-                  return;
-              }
-              const newUser = { id: users.length + 1, email, password, role, ... };
-              users.push(newUser);
-              localStorage.setItem('users', JSON.stringify(users));
-              redirectToDashboard(role);
-          }
-      });
-  });
-  ```
+**Примечание**:
+- Поле `secretKey` присутствует только для роли администратора.
+- Пароли хранятся в открытом виде (для демо); в продакшене требуется хеширование.
 
 ## Зависимости
 
-- **Font Awesome**: Не используется в `auth`, но подключена в проекте для единообразия.
-- **Локальный сервер**: Для корректной работы `fetch` требуется запуск через `http-server`.
+- **CSS**: Стили определены в `style.css`, без внешних библиотек.
+- **Данные**:
+  - `auth/data/users.json`: Начальные данные пользователей.
+  - `localStorage`: Хранение зарегистрированных пользователей и текущей сессии.
+
+**Код**:
+```html
+<link rel="stylesheet" href="style.css">
+```
 
 ## Инструкции по использованию
 
-1. Перейдите на `auth/index.html`.
-2. Выберите роль (покупатель, продавец, админ).
-3. Введите email/телефон и пароль или зарегистрируйтесь, нажав «Зарегистрироваться».
-4. Для роли администратора введите секретный ключ (`ADMKEY2025` при регистрации).
+1. **Переход на страницу**:
+   - Откройте `auth/index.html` в браузере.
+2. **Выбор роли**:
+   - Выберите роль: «Покупатель», «Продавец» или «Админ».
+   - Для роли «Админ» появится поле секретного ключа.
+3. **Вход**:
+   - Введите email/телефон и пароль.
+   - Для администратора введите секретный ключ (`ADMKEY2025`).
+   - Нажмите «Продолжить» для входа.
+   - После успешного входа вы будете перенаправлены на соответствующий дашборд:
+     - Покупатель: `dashboard/buyer/index.html`
+     - Продавец: `dashboard/seller/index.html`
+     - Админ: `dashboard/admin/index.html`
+4. **Регистрация**:
+   - Нажмите «Зарегистрироваться» для переключения режима.
+   - Введите имя пользователя, email/телефон и пароль.
+   - Для администратора введите секретный ключ.
+   - Нажмите «Зарегистрироваться» для создания аккаунта.
+   - После регистрации вы автоматически войдёте в систему и будете перенаправлены.
+5. **Выход**:
+   - В дашборде нажмите «Выйти» для удаления `userData` и возвращения на страницу авторизации.
+
+**Код**:
+```javascript
+function redirectToDashboard(role) {
+    switch (role) {
+        case 'buyer':
+            window.location.href = '../dashboard/buyer/index.html';
+            break;
+        case 'seller':
+            window.location.href = '../dashboard/seller/index.html';
+            break;
+        case 'admin':
+            window.location.href = '../dashboard/admin/index.html';
+            break;
+    }
+}
+```
 
 ## Тестирование
 
-- **Сценарии**:
-  - Успешный вход с существующими данными.
-  - Регистрация нового пользователя.
-  - Ошибка при неверном пароле/секретном ключе.
-  - Проверка перенаправления на правильную панель.
-- **Инструменты**: Ручное тестирование, DevTools для отладки.
-
-## Ограничения
-
-- Пароли хранятся в открытом виде (небезопасно для продакшена).
-- Нет восстановления пароля.
-- Отсутствует серверная валидация.
-
-## Будущие улучшения
-
-- Хеширование паролей (например, с использованием bcrypt).
-- Интеграция с сервером для хранения пользователей.
+### Сценарии тестирования
+1. **Вход**:
+   - Попробуйте войти с данными из `users.json` (например, `buyer1@example.com`, пароль `password123`, роль «Покупатель»).
+   - Проверьте вход с неверным паролем или email.
+   - Для роли администратора проверьте вход с неверным секретным ключом.
+2. **Регистрация**:
+   - Зарегистрируйте нового пользователя с уникальным email.
+   - Попробуйте зарегистрироваться с уже существующим email.
+   - Проверьте регистрацию администратора с неверным секретным ключом.
+3. **Переключение режимов**:
+   - Убедитесь, что переключение между входом и регистрацией корректно обновляет форму.
+   - Проверьте добавление/удаление поля имени пользователя.
+4. **Роли**:
+   - Проверьте, что выбор роли изменяет видимость поля секретного ключа.
+   - Убедитесь, что перенаправление соответствует выбранной роли.
+5. **Обработка ошибок**:
+   - Отключите доступ к `users.json` и проверьте работу с `localStorage`.
+   - Проверьте сообщения об ошибках при неверных данных.
