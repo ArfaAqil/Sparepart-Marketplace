@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки платформы | Автозапчасти</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="logo">АВТОЗАПЧАСТИ</div>
+            <nav class="user-nav">
+                <a href="../index.html" class="home-btn"><i class="fas fa-home"></i> Главная</a>
+                <span class="username">Добро пожаловать, <span id="displayUsername">Администратор</span></span>
+                <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="settings-main">
+        <div class="container">
+            <h1>Настройки платформы</h1>
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label for="minShippingCost">Минимальная стоимость доставки (₽)</label>
+                    <input type="number" id="minShippingCost" value="1000" min="0" step="100">
+                </div>
+                <div class="form-group">
+                    <label for="weightCoefficient">Коэффициент доставки по весу (₽/кг)</label>
+                    <input type="number" id="weightCoefficient" value="100" min="0" step="10">
+                </div>
+                <div class="form-group">
+                    <label for="distanceCoefficient">Коэффициент доставки по расстоянию (₽/км)</label>
+                    <input type="number" id="distanceCoefficient" value="0.15" min="0" step="0.01">
+                </div>
+                <button type="submit" class="btn">Сохранить</button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>© 2025 Автозапчасти | <a href="#">Помощь</a> | <a href="#">О нас</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

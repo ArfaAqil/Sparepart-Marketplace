@@ -1,0 +1,154 @@
+:root {
+    --primary: #6a1b9a; /* Ungu tua untuk admin */
+    --primary-light: #ab47bc; /* Ungu muda */
+    --primary-dark: #4a148c; /* Ungu lebih gelap */
+    --secondary: #ab47bc; /* Ungu muda sebagai sekunder */
+    --accent: #ff4081; /* Pink cerah untuk aksen */
+    --background: #f5f7fa;
+    --surface: #ffffff;
+    --error: #ef233c;
+    --success: #4bb543;
+    --text-primary: #2b2d42;
+    --text-secondary: #6c757d;
+    --text-on-primary: #ffffff;
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --border-radius: 12px;
+    --border-width: 1px;
+    --border-color: #e9ecef;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+    --transition-fast: 0.15s;
+    --transition-normal: 0.3s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.dashboard-header {
+    background-color: #034282;
+    color: white;
+    padding: 15px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.user-nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.home-btn {
+    color: white;
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s;
+}
+
+.home-btn:hover {
+    background-color: #34495e;
+}
+
+.username {
+    font-size: 16px;
+}
+
+.logout-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: #c0392b;
+}
+
+.admin-main {
+    padding: var(--spacing-xl) 0;
+}
+
+h1 {
+    margin-bottom: var(--spacing-lg);
+}
+
+.admin-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.action-btn {
+    background: var(--primary);
+    color: var(--text-on-primary);
+    border: none;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    text-align: center;
+    justify-content: center;
+    transition: background 0.3s;
+}
+
+.action-btn:hover {
+    background: var(--primary-dark);
+}
+
+.dashboard-footer {
+    background-color: #034282;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    margin-top: 40px;
+}
+
+.dashboard-footer a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+.dashboard-footer a:hover {
+    text-decoration: underline;
+}
