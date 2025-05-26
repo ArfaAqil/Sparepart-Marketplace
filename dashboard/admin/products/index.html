@@ -46,6 +46,111 @@
         </div>
     </main>
 
+    <!-- Product Modal -->
+    <div class="product-modal" id="productModal">
+        <div class="modal-content">
+            <button class="close-modal">×</button>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be inserted by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div class="modal" id="editProductModal">
+        <div class="modal-content">
+            <button class="close-modal">×</button>
+            <h2 id="modalTitle">Редактировать продукт</h2>
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="productName">Название</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Цена (₽)</label>
+                    <input type="number" id="productPrice" required min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="productWeight">Вес (кг)</label>
+                    <input type="number" id="productWeight" required min="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="productBrand">Бренд</label>
+                    <input type="text" id="productBrand" required>
+                </div>
+                <div class="form-group">
+                    <label for="productModel">Модель</label>
+                    <input type="text" id="productModel" required>
+                </div>
+                <div class="form-group">
+                    <label for="productYear">Год</label>
+                    <input type="number" id="productYear" required min="1900" max="2025">
+                </div>
+                <div class="form-group">
+                    <label for="productCategory">Категория</label>
+                    <select id="productCategory" required>
+                        <option value="Тормоза">Тормоза</option>
+                        <option value="Подвеска">Подвеска</option>
+                        <option value="Двигатель">Двигатель</option>
+                        <option value="Фильтры">Фильтры</option>
+                        <option value="Смазки">Смазки</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productCondition">Состояние</label>
+                    <select id="productCondition" required>
+                        <option value="new">Новое</option>
+                        <option value="used">Б/У</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productInStock">В наличии</label>
+                    <input type="checkbox" id="productInStock">
+                </div>
+                <div class="form-group">
+                    <label for="productHasWarranty">Гарантия</label>
+                    <input type="checkbox" id="productHasWarranty">
+                </div>
+                <div class="form-group">
+                    <label for="productSellerRating">Рейтинг продавца (1-5)</label>
+                    <input type="number" id="productSellerRating" required min="1" max="5" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="productVin">VIN</label>
+                    <input type="text" id="productVin" required>
+                </div>
+                <div class="form-group">
+                    <label for="productDescription">Описание</label>
+                    <textarea id="productDescription" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Изображения (до 5, формат: product/image.jpg)</label>
+                    <input type="text" id="productImage1" placeholder="product/image1.jpg">
+                    <input type="text" id="productImage2" placeholder="product/image2.jpg">
+                    <input type="text" id="productImage3" placeholder="product/image3.jpg">
+                    <input type="text" id="productImage4" placeholder="product/image4.jpg">
+                    <input type="text" id="productImage5" placeholder="product/image5.jpg">
+                </div>
+                <div class="form-group">
+                    <label for="specMaterial">Материал</label>
+                    <input type="text" id="specMaterial" required>
+                </div>
+                <div class="form-group">
+                    <label for="specCompatibility">Совместимость</label>
+                    <input type="text" id="specCompatibility" required>
+                </div>
+                <div class="form-group">
+                    <label for="specWarranty">Гарантия</label>
+                    <input type="text" id="specWarranty" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn">Сохранить</button>
+                    <button type="button" class="btn close-btn">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <footer class="dashboard-footer">
         <div class="container">
             <p>© 2025 Автозапчасти | <a href="#">Помощь</a> | <a href="#">О нас</a></p>

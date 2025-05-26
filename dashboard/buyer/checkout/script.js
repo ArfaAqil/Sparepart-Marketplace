@@ -363,6 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             try {
                 currentDistance = await calculateDistanceFromMoscow(city);
+                console.log(`Distance to ${city}: ${currentDistance} km`);
                 updateShippingCost();
             } catch (error) {
                 console.error('Distance calculation error:', error);
@@ -382,19 +383,54 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         await new Promise(resolve => setTimeout(resolve, 500));
-        return cityDistances[city] || 1000; // Default distance for unknown cities
+        return cityDistances[city] ?? 1000; // Default distance for unknown cities
     }
 
     function updateShippingCost() {
         if (!orderSummary?.items) return;
 
+        // Load shipping parameters from localStorage (set by admin)
+        const settings = JSON.parse(localStorage.getItem('platformSettings') || '{}');
+        const minShippingCost = parseFloat(settings.minShippingCost) ?? 0; // Default to 0 if undefined
+        const weightCoefficient = parseFloat(settings.weightCoefficient) ?? 100; // Default to 100 if undefined
+        const distanceCoefficient = parseFloat(settings.distanceCoefficient) ?? 0; // Default to 0 if undefined
+
+        // Log parameters for debugging
+        console.log('Shipping parameters:', {
+            minShippingCost,
+            weightCoefficient,
+            distanceCoefficient,
+            currentDistance
+        });
+
+        // Calculate base shipping cost based on weight
         const baseShipping = orderSummary.items.reduce(
-            (total, item) => total + (item.weight * item.quantity * 100), 0);
-        const distanceCost = currentDistance * 0.15;
-        
-        orderSummary.shipping = Math.max(baseShipping + distanceCost, 1000);
+            (total, item) => {
+                const weight = parseFloat(item.weight) || 1; // Default weight if undefined
+                return total + (weight * item.quantity * weightCoefficient);
+            }, 0);
+
+        // Calculate distance-based cost
+        const distanceCost = currentDistance * distanceCoefficient;
+
+        // Calculate total shipping cost, respecting minShippingCost
+        const totalShippingCost = baseShipping + distanceCost;
+        orderSummary.shipping = minShippingCost > 0 ? Math.max(totalShippingCost, minShippingCost) : totalShippingCost;
+
+        // Update total
         orderSummary.total = orderSummary.subtotal + orderSummary.shipping;
-        
+
+        // Log calculations for debugging
+        console.log('Shipping calculation:', {
+            baseShipping,
+            distanceCost,
+            totalShippingCost,
+            minShippingCost,
+            finalShipping: orderSummary.shipping,
+            total: orderSummary.total
+        });
+
+        // Update UI
         if (orderShipping) {
             orderShipping.textContent = orderSummary.shipping.toLocaleString('ru-RU') + ' ₽';
         }
@@ -402,8 +438,10 @@ document.addEventListener('DOMContentLoaded', function() {
             orderTotal.textContent = orderSummary.total.toLocaleString('ru-RU') + ' ₽';
         }
         
+        // Save updated order summary
         localStorage.setItem('orderSummary', JSON.stringify(orderSummary));
         
+        // Update COD payment details if selected
         if (codPayment?.checked) {
             updateCodPaymentDetails();
         }

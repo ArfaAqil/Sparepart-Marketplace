@@ -79,10 +79,15 @@ document.addEventListener('DOMContentLoaded', async function() {
                         ${order.items.map(item => `
                             <div class="order-item">
                                 <div class="item-image">
-                                    <img src="${item.images[0]}" alt="${item.name}">
+                                    <img src="${item.images[0].replace('../../', '../../../')}" alt="${item.name}" 
+                                         onerror="this.onerror=null;this.src='https://via.placeholder.com/40x40?text=No+Image'">
                                 </div>
                                 <div class="item-info">
                                     <h4>${item.name}</h4>
+                                    <div class="item-icon">
+                                        <img src="${item.images[0].replace('../../', '../../../')}" alt="${item.name} Icon" 
+                                             onerror="this.onerror=null;this.src='https://via.placeholder.com/40x40?text=No+Image'">
+                                    </div>
                                     <p>${item.quantity} × ${item.price.toLocaleString('ru-RU')} ₽</p>
                                 </div>
                             </div>

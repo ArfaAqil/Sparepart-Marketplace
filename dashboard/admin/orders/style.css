@@ -72,6 +72,23 @@
     object-fit: cover;
 }
 
+.item-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.item-icon {
+    margin-top: var(--spacing-xs);
+}
+
+.item-icon img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: var(--border-radius);
+}
+
 .order-actions {
     display: flex;
     gap: var(--spacing-sm);

@@ -8,22 +8,39 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Load users data from users.json and localStorage
     let users = [];
-    try {
-        // Load from users.json
-        const response = await fetch('../auth/data/users.json');
-        if (!response.ok) throw new Error('Failed to load users.json');
-        const jsonUsers = await response.json();
-        
-        // Load from localStorage
-        const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
-        
-        // Combine users, ensuring no duplicates by email
-        const allUsers = [...jsonUsers, ...localUsers];
-        users = Array.from(new Map(allUsers.map(u => [u.email, u])).values());
-    } catch (error) {
-        console.error('Error loading users:', error);
-        // Fallback to localStorage only
-        users = JSON.parse(localStorage.getItem('users') || '[]');
+    async function loadUsers() {
+        try {
+            // Load from users.json
+            const response = await fetch('../auth/data/users.json');
+            if (!response.ok) throw new Error('Failed to load users.json');
+            const jsonUsers = await response.json();
+            
+            // Load blocked status from localStorage
+            const blockedUsers = JSON.parse(localStorage.getItem('blockedUsers') || '{}');
+            
+            // Load localStorage users
+            const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            // Combine users, ensuring no duplicates by email
+            users = [...jsonUsers, ...localUsers].reduce((acc, user) => {
+                if (!acc.some(u => u.email === user.email)) {
+                    acc.push({
+                        ...user,
+                        blocked: blockedUsers[user.email] || false
+                    });
+                }
+                return acc;
+            }, []);
+        } catch (error) {
+            console.error('Error loading users:', error);
+            // Fallback to localStorage only
+            const blockedUsers = JSON.parse(localStorage.getItem('blockedUsers') || '{}');
+            const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
+            users = localUsers.map(user => ({
+                ...user,
+                blocked: blockedUsers[user.email] || false
+            }));
+        }
     }
 
     // Role Selection
@@ -63,6 +80,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     authForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        await loadUsers(); // Ensure users are loaded
+        
         const role = document.querySelector('.role-btn.active').dataset.role;
         const username = document.getElementById('username')?.value || '';
         const email = document.getElementById('email').value;
@@ -75,6 +94,10 @@ document.addEventListener('DOMContentLoaded', async function() {
             const user = users.find(u => u.email === email && u.password === password && u.role === role);
             if (!user) {
                 alert('Неверный email, пароль или роль');
+                return;
+            }
+            if (user.blocked) {
+                alert('Ваш аккаунт заблокирован. Обратитесь к администратору.');
                 return;
             }
             if (role === 'admin' && user.secretKey !== secretKey) {
@@ -102,12 +125,14 @@ document.addEventListener('DOMContentLoaded', async function() {
                 email,
                 password,
                 role,
+                blocked: false,
                 ...(role === 'admin' && { secretKey })
             };
 
             // Save new user to localStorage
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
+            let localUsers = JSON.parse(localStorage.getItem('users') || '[]');
+            localUsers.push(newUser);
+            localStorage.setItem('users', JSON.stringify(localUsers));
             localStorage.setItem('userData', JSON.stringify(newUser));
             alert('Регистрация успешна!');
             redirectToDashboard(role);
@@ -126,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 window.location.href = '../dashboard/admin/index.html';
                 break;
             default:
-                alert('Нedopустимая роль');
+                alert('Недопустимая роль');
         }
     }
 });
