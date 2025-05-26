@@ -1,0 +1,44 @@
+.analytics-main {
+    padding: var(--spacing-xl) 0;
+}
+
+.analytics-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.analytics-card {
+    background: var(--surface);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.analytics-card canvas {
+    max-height: 300px;
+}
+
+.action-btn {
+    background: var(--primary);
+    color: var(--text-on-primary);
+    border: none;
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+.action-btn:hover {
+    background: var(--primary-dark);
+}

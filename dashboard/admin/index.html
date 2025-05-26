@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора | Автозапчасти</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="logo">АВТОЗАПЧАСТИ</div>
+            <nav class="user-nav">
+                <a href="../index.html" class="home-btn"><i class="fas fa-home"></i> Главная</a>
+                <span class="username">Добро пожаловать, <span id="displayUsername">Администратор</span></span>
+                <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <div class="container">
+            <h1>Панель администратора</h1>
+            <div class="admin-actions">
+                <a href="products/index.html" class="action-btn"><i class="fas fa-cogs"></i> Модерация товаров</a>
+                <a href="users/index.html" class="action-btn"><i class="fas fa-users"></i> Управление пользователями</a>
+                <a href="orders/index.html" class="action-btn"><i class="fas fa-box"></i> Управление заказами</a>
+                <a href="analytics/index.html" class="action-btn"><i class="fas fa-chart-bar"></i> Аналитика платформы</a>
+                <a href="settings/index.html" class="action-btn"><i class="fas fa-cog"></i> Настройки платформы</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>© 2025 Автозапчасти | <a href="#">Помощь</a> | <a href="#">О нас</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

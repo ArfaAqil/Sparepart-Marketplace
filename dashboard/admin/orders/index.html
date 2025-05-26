@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление заказами | Автозапчасти</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="logo">АВТОЗАПЧАСТИ</div>
+            <nav class="user-nav">
+                <a href="../index.html" class="home-btn"><i class="fas fa-home"></i> Главная</a>
+                <span class="username">Добро пожаловать, <span id="displayUsername">Администратор</span></span>
+                <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="orders-main">
+        <div class="container">
+            <h1>Управление заказами</h1>
+            <div class="orders-filters">
+                <select id="statusFilter" class="filter-select">
+                    <option value="all">Все статусы</option>
+                    <option value="Ожидает оплаты">Ожидает оплаты</option>
+                    <option value="Оплачено">Оплачено</option>
+                    <option value="Оплата при получении">Оплата при получении</option>
+                    <option value="В обработке">В обработке</option>
+                    <option value="Отправлено">Отправлено</option>
+                    <option value="Доставлено">Доставлено</option>
+                    <option value="Отменен">Отменен</option>
+                </select>
+                <input type="date" id="dateFilter" class="filter-select">
+                <input type="text" id="searchFilter" placeholder="Поиск по номеру или клиенту" class="filter-select">
+            </div>
+            <div class="order-list" id="orderList">
+                <!-- Orders will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>© 2025 Автозапчасти | <a href="#">Помощь</a> | <a href="#">О нас</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -54,22 +54,35 @@ document.addEventListener('DOMContentLoaded', async function() {
         const response = await fetch('../buyer/data/products.json');
         if (!response.ok) throw new Error('Failed to load products.json');
         jsonProducts = await response.json();
-        jsonProducts = jsonProducts.map(p => ({ ...p, id: String(p.id) }));
+        jsonProducts = jsonProducts.map(p => ({
+            ...p,
+            id: String(p.id),
+            status: p.status && ['pending', 'approved', 'rejected'].includes(p.status) ? p.status : 'pending'
+        }));
         console.log('jsonProducts:', jsonProducts);
         
         localProducts = JSON.parse(localStorage.getItem('products') || '[]');
-        localProducts = localProducts.map(p => ({ ...p, id: String(p.id) }));
+        localProducts = localProducts.map(p => ({
+            ...p,
+            id: String(p.id),
+            status: p.status && ['pending', 'approved', 'rejected'].includes(p.status) ? p.status : 'pending'
+        }));
         console.log('localProducts:', localProducts);
         
         const allProducts = [...jsonProducts, ...localProducts];
-        products = Array.from(new Map(allProducts.map(p => [p.id, p])).values());
-        console.log('Merged products:', products);
+        products = Array.from(new Map(allProducts.map(p => [p.id, p])).values())
+            .filter(p => p.status !== 'rejected');
+        console.log('Merged products (filtered for display):', products);
     } catch (e) {
         console.error('Error loading products:', e);
         localProducts = JSON.parse(localStorage.getItem('products') || '[]');
-        localProducts = localProducts.map(p => ({ ...p, id: String(p.id) }));
-        products = localProducts;
-        console.log('Fallback to localProducts:', products);
+        localProducts = localProducts.map(p => ({
+            ...p,
+            id: String(p.id),
+            status: p.status && ['pending', 'approved', 'rejected'].includes(p.status) ? p.status : 'pending'
+        }));
+        products = localProducts.filter(p => p.status !== 'rejected');
+        console.log('Fallback to localProducts (filtered for display):', products);
     }
 
     // Display products
@@ -273,7 +286,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                     material: document.getElementById('specMaterial').value || 'Стандарт',
                     compatibility: document.getElementById('specCompatibility').value || 'Unknown',
                     warranty: document.getElementById('specWarranty').value || '1 год'
-                }
+                },
+                status: productId ? (products.find(p => p.id === productId)?.status || 'pending') : 'pending'
             };
 
             let localProducts = JSON.parse(localStorage.getItem('products') || '[]');
@@ -283,7 +297,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                 localProducts.push(newProduct);
             }
             localStorage.setItem('products', JSON.stringify(localProducts));
-            products = [...jsonProducts, ...localProducts];
+            products = [...jsonProducts, ...localProducts]
+                .filter(p => p.status !== 'rejected');
             products = Array.from(new Map(products.map(p => [p.id, p])).values());
             console.log('Updated products:', products);
             renderProducts(products);
@@ -510,7 +525,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                 let localProducts = JSON.parse(localStorage.getItem('products') || '[]');
                 localProducts = localProducts.filter(p => p.id !== productId);
                 localStorage.setItem('products', JSON.stringify(localProducts));
-                products = [...jsonProducts, ...localProducts];
+                products = [...jsonProducts, ...localProducts]
+                    .filter(p => p.status !== 'rejected');
                 products = Array.from(new Map(products.map(p => [p.id, p])).values());
                 console.log('Products after delete:', products);
                 renderProducts(products);
@@ -530,4 +546,4 @@ document.addEventListener('DOMContentLoaded', async function() {
     } else {
         console.error('logout-btn not found in DOM');
     }
-}); 
+});

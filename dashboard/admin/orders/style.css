@@ -1,0 +1,124 @@
+.orders-main {
+    padding: var(--spacing-xl) 0;
+}
+
+.orders-filters {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.filter-select {
+    padding: var(--spacing-md);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 300px;
+}
+
+.order-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+}
+
+.order-card {
+    background: var(--surface);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.order-header {
+    cursor: pointer;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.order-meta, .order-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-details {
+    display: none;
+    padding: var(--spacing-md);
+}
+
+.order-details.show {
+    display: block;
+}
+
+.order-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+.order-items {
+    margin-top: var(--spacing-md);
+}
+
+.order-item {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+}
+
+.item-image img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.item-icon {
+    margin-top: var(--spacing-xs);
+}
+
+.item-icon img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: var(--border-radius);
+}
+
+.order-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+
+.status-select {
+    padding: var(--spacing-sm);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.btn {
+    background: var(--primary);
+    color: var(--text-on-primary);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn:hover {
+    background: var(--primary-dark);
+}
+
+.fa-chevron-down {
+    transition: transform var(--transition-normal);
+}
+
+.fa-chevron-down.rotate {
+    transform: rotate(180deg);
+}

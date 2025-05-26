@@ -1,28 +1,23 @@
 document.addEventListener('DOMContentLoaded', async function() {
-    // DOM Elements
     const filterToggle = document.getElementById('filterToggle');
     const filterSidebar = document.getElementById('filterSidebar');
     const closeFilter = document.querySelector('.close-filter');
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
     document.body.appendChild(overlay);
-    
-    // Modal elements
+
     const productModal = document.getElementById('productModal');
     const closeModal = document.querySelector('.close-modal');
     const modalBody = document.getElementById('modalBody');
-    
-    // Cart elements
+
     const cartIcon = document.getElementById('cartIcon');
     const cartCounter = document.getElementById('cartCounter');
-    
-    // Load user data
+
     const userData = JSON.parse(localStorage.getItem('userData'));
     if (userData && userData.username) {
         document.getElementById('displayUsername').textContent = userData.username;
     }
 
-    // Normalize and validate product structure
     function normalizeProduct(product) {
         if (!product || typeof product !== 'object') {
             console.warn('Invalid product: Not an object', product);
@@ -49,10 +44,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                 material: product.specifications?.material || 'Unknown',
                 compatibility: product.specifications?.compatibility || 'Unknown',
                 warranty: product.specifications?.warranty || 'None'
-            }
+            },
+            status: product.status && ['pending', 'approved', 'rejected'].includes(product.status) ? product.status : 'pending'
         };
 
-        // Log warnings for missing or invalid properties
         const requiredProps = ['id', 'name', 'brand', 'model', 'year', 'price', 'weight', 'category', 'condition', 'inStock', 'hasWarranty', 'sellerRating', 'vin', 'description', 'images'];
         requiredProps.forEach(prop => {
             if (!(prop in product)) {
@@ -77,28 +72,24 @@ document.addEventListener('DOMContentLoaded', async function() {
         return defaultProduct;
     }
 
-    // Load product data
     let products = [];
     try {
         const response = await fetch('data/products.json');
         if (!response.ok) throw new Error('Failed to load products.json');
         let jsonProducts = await response.json();
-        console.log('Raw products.json:', jsonProducts);
-        // Normalize products and ensure IDs are strings
         jsonProducts = jsonProducts.map(p => normalizeProduct({ ...p, id: String(p.id) })).filter(p => p !== null);
         const localProducts = JSON.parse(localStorage.getItem('products') || '[]')
             .map(p => normalizeProduct({ ...p, id: String(p.id) }))
             .filter(p => p !== null);
         const allProducts = [...jsonProducts, ...localProducts];
-        // Remove duplicates based on ID
-        products = Array.from(new Map(allProducts.map(p => [p.id, p])).values());
-        console.log('Normalized products loaded:', products);
+        products = Array.from(new Map(allProducts.map(p => [p.id, p])).values())
+            .filter(p => p.status === 'approved');
     } catch (error) {
         console.error('Error loading products:', error);
         let localProducts = JSON.parse(localStorage.getItem('products') || '[]')
             .map(p => normalizeProduct({ ...p, id: String(p.id) }))
             .filter(p => p !== null);
-        products = localProducts;
+        products = localProducts.filter(p => p.status === 'approved');
         if (products.length === 0) {
             products = [
                 {
@@ -121,18 +112,16 @@ document.addEventListener('DOMContentLoaded', async function() {
                         material: "Керамика",
                         compatibility: "Toyota Corolla 2015-2023",
                         warranty: "2 года"
-                    }
+                    },
+                    status: "approved"
                 }
             ];
         }
-        console.log('Fallback products:', products);
     }
 
-    // Initialize cart
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     updateCartCounter();
 
-    // Filter elements
     const searchInput = document.getElementById('searchInput');
     const productSearch = document.getElementById('productSearch');
     const brandFilter = document.getElementById('brandFilter');
@@ -155,7 +144,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     const resetFilter = document.querySelector('.reset-filter');
     const stars = document.querySelectorAll('.stars span');
 
-    // Dynamically populate brand and model filters
     const brands = [...new Set(products.map(p => p.brand))].sort();
     const brandModels = {};
     brands.forEach(brand => {
@@ -165,7 +153,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     brandFilter.innerHTML = '<option value="">Все марки</option>' + 
         brands.map(brand => `<option value="${brand}">${brand}</option>`).join('');
 
-    // Populate category filters
     const categories = [...new Set(products.map(p => p.category))].sort();
     const categoryCheckboxes = document.querySelectorAll('.filter-group input[type="checkbox"][id^="category"]');
     categoryCheckboxes.forEach(checkbox => {
@@ -189,10 +176,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 
-    // Current image index for modal carousel
     let currentImageIndex = 0;
 
-    // Toggle filter sidebar
     filterToggle.addEventListener('click', () => {
         filterSidebar.classList.add('active');
         overlay.classList.add('active');
@@ -209,12 +194,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         productModal.classList.remove('active');
     });
 
-    // Price slider
     priceSlider.addEventListener('input', function() {
         maxPrice.textContent = this.value;
     });
 
-    // Brand-Model relationship
     brandFilter.addEventListener('change', function() {
         modelFilter.innerHTML = '<option value="">Все модели</option>';
         if (this.value) {
@@ -227,7 +210,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 
-    // Star rating selection
     stars.forEach(star => {
         star.addEventListener('click', function() {
             stars.forEach(s => s.classList.remove('active'));
@@ -235,7 +217,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     });
 
-    // Render products
     function renderProducts(productsToRender) {
         const productGrid = document.getElementById('productGrid');
         productGrid.innerHTML = '';
@@ -278,40 +259,29 @@ document.addEventListener('DOMContentLoaded', async function() {
             productGrid.appendChild(card);
         });
 
-        // Add event listeners to product cards
         document.querySelectorAll('.product-card').forEach(card => {
             card.addEventListener('click', function(e) {
                 if (!e.target.classList.contains('add-to-cart')) {
                     const productId = this.dataset.id;
-                    console.log('Product card clicked, ID:', productId);
                     const product = products.find(p => p.id === productId);
                     if (product) {
-                        console.log('Product found:', product);
                         showProductModal(product);
-                    } else {
-                        console.error('Product not found for ID:', productId);
                     }
                 }
             });
         });
 
-        // Add event listeners to add-to-cart buttons
         document.querySelectorAll('.add-to-cart').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const productId = this.closest('.product-card').dataset.id;
-                console.log('Add to cart clicked, ID:', productId);
                 const product = products.find(p => p.id === productId);
                 if (product) {
-                    console.log('Product found for cart:', product);
                     addToCart(product);
-                } else {
-                    console.error('Product not found for cart, ID:', productId);
                 }
             });
         });
 
-        // Detect image orientation
         setTimeout(() => {
             productsToRender.forEach(product => {
                 const imgContainer = document.getElementById(`productImage-${product.id}`);
@@ -328,7 +298,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         }, 0);
     }
 
-    // Show product modal with image carousel
     function showProductModal(product) {
         currentImageIndex = 0;
         
@@ -383,7 +352,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             </div>
         `;
 
-        // Add event listeners for carousel navigation
         const mainImage = document.querySelector('.main-image');
         const thumbnails = document.querySelectorAll('.thumbnail');
         const prevButton = document.querySelector('.carousel-prev');
@@ -398,28 +366,23 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         thumbnails.forEach(thumb => {
             thumb.addEventListener('click', function() {
-                console.log('Thumbnail clicked, index:', this.dataset.index);
                 updateMainImage(parseInt(this.dataset.index));
             });
         });
 
         prevButton.addEventListener('click', function(e) {
             e.stopPropagation();
-            console.log('Previous button clicked');
             const newIndex = (currentImageIndex - 1 + product.images.length) % product.images.length;
             updateMainImage(newIndex);
         });
 
         nextButton.addEventListener('click', function(e) {
             e.stopPropagation();
-            console.log('Next button clicked');
             const newIndex = (currentImageIndex + 1) % product.images.length;
             updateMainImage(newIndex);
         });
 
-        // Add event listener to modal add to cart button
         document.querySelector('.modal-add-to-cart').addEventListener('click', function() {
-            console.log('Modal add to cart clicked, ID:', product.id);
             addToCart(product);
             productModal.classList.remove('active');
             overlay.classList.remove('active');
@@ -427,19 +390,14 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         productModal.classList.add('active');
         overlay.classList.add('active');
-        console.log('Product modal shown for product:', product.name);
     }
 
-    // Close modal
     closeModal.addEventListener('click', function() {
-        console.log('Product modal closed');
         productModal.classList.remove('active');
         overlay.classList.remove('active');
     });
 
-    // Add to cart function
     function addToCart(product) {
-        console.log('Adding to cart:', product);
         const existingItem = cart.find(item => item.id === product.id);
         
         if (existingItem) {
@@ -453,8 +411,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartCounter();
-        
-        // Show notification
+
         const notification = document.createElement('div');
         notification.className = 'cart-notification';
         notification.textContent = `${product.name} добавлен в корзину`;
@@ -472,20 +429,17 @@ document.addEventListener('DOMContentLoaded', async function() {
         }, 3000);
     }
 
-    // Update cart counter
     function updateCartCounter() {
         const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
         cartCounter.textContent = totalItems;
     }
 
-    // Go to cart page
     if (cartIcon) {
         cartIcon.addEventListener('click', function() {
             window.location.href = 'cart/index.html';
         });
     }
 
-    // Apply filters
     function applyFilters() {
         const searchTerm = (searchInput.value || productSearch.value).toLowerCase();
         const selectedBrand = brandFilter.value;
@@ -528,7 +482,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         overlay.classList.remove('active');
     }
 
-    // Reset filters
     function resetFilters() {
         searchInput.value = '';
         productSearch.value = '';
@@ -550,7 +503,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         renderProducts(products);
     }
 
-    // Event listeners
     applyFilter.addEventListener('click', applyFilters);
     resetFilter.addEventListener('click', resetFilters);
     searchInput.addEventListener('keyup', function(e) {
@@ -560,18 +512,15 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (e.key === 'Enter') applyFilters();
     });
 
-    // Add click event for search button
     const searchBtn = document.querySelector('.search-btn');
     if (searchBtn) {
         searchBtn.addEventListener('click', applyFilters);
     }
 
-    // Logout
     document.querySelector('.logout-btn').addEventListener('click', function() {
         localStorage.removeItem('userData');
         window.location.href = '../../auth/index.html';
     });
 
-    // Initial render
     renderProducts(products);
 });
