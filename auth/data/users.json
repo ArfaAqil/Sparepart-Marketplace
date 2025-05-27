@@ -2,7 +2,7 @@
   {
       "id": 1,
       "username": "buyer1",
-      "email": "@example.cobuyer1m",
+      "email": "buyer1@example.com",
       "password": "password123",
       "role": "buyer"
   },
