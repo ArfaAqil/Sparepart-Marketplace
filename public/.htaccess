@@ -1,0 +1,5 @@
+# Перенаправление всех запросов на index.php, чтобы работал роутинг через PHP.
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L,QSA]
