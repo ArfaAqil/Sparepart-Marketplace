@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформление заказа | Автозапчасти</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="logo">АВТОЗАПЧАСТИ</div>
+            <nav class="user-nav">
+                <span class="username">Добро пожаловать, <span id="displayUsername">Покупатель</span></span>
+                <div class="cart-icon-container">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-counter" id="cartCounter">0</span>
+                </div>
+                <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="checkout-main">
+        <div class="container">
+            <h1>Оформление заказа</h1>
+            
+            <div class="checkout-container">
+                <div class="checkout-form">
+                    <h2>Данные доставки</h2>
+                    <form id="deliveryForm">
+                        <div class="form-group">
+                            <label for="fullName">ФИО</label>
+                            <input type="text" id="fullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Телефон</label>
+                            <input type="tel" id="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">Город</label>
+                            <select id="city" required>
+                                <option value="">Выберите город</option>
+                                <option value="Москва">Москва</option>
+                                <option value="Санкт-Петербург">Санкт-Петербург</option>
+                                <option value="Казань">Казань</option>
+                                <option value="Новосибирск">Новосибирск</option>
+                                <option value="Екатеринбург">Екатеринбург</option>
+                                <option value="Ростов-на-Дону">Ростов-на-Дону</option>
+                                <option value="Владивосток">Владивосток</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Адрес</label>
+                            <input type="text" id="address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="deliveryDate">Дата доставки</label>
+                            <input type="date" id="deliveryDate" required>
+                        </div>
+                        
+                        <h2>Способ оплаты</h2>
+                        <div class="payment-methods">
+                            <div class="payment-method">
+                                <input type="radio" id="cardPayment" name="paymentMethod" value="card" checked>
+                                <label for="cardPayment">Банковская карта</label>
+                                <div class="card-details" id="cardDetails">
+                                    <div class="form-group">
+                                        <label for="cardNumber">Номер карты</label>
+                                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" required>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="cardExpiry">Срок действия</label>
+                                            <input type="text" id="cardExpiry" placeholder="MM/ГГ" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="cardCvv">CVV</label>
+                                            <input type="text" id="cardCvv" placeholder="123" required>
+                                        </div>
+                                    </div>
+                                    <div class="card-icons">
+                                        <img src="https://via.placeholder.com/40x25?text=MIR" alt="MIR">
+                                        <img src="https://via.placeholder.com/40x25?text=VISA" alt="VISA">
+                                        <img src="https://via.placeholder.com/40x25?text=MC" alt="Mastercard">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="payment-method">
+                                <input type="radio" id="codPayment" name="paymentMethod" value="cod">
+                                <label for="codPayment">Наложенный платеж</label>
+                                <div class="cod-details" id="codDetails">
+                                    <p>Оплата при получении товара. Дополнительная комиссия 2%.</p>
+                                    <div class="qr-code" id="qrCode">
+                                        <!-- QR code will be generated here -->
+                                    </div>
+                                    <div class="payment-amount" id="paymentAmount"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="checkout-actions">
+                            <a href="../cart/index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Вернуться в корзину</a>
+                            <button type="submit" class="submit-order">Оформить заказ</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="order-summary">
+                    <h2>Ваш заказ</h2>
+                    <div class="order-items" id="orderItems">
+                        <!-- Order items will be inserted here by JavaScript -->
+                    </div>
+                    <div class="order-totals">
+                        <div class="summary-row">
+                            <span>Товары</span>
+                            <span id="orderSubtotal">0 ₽</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Доставка</span>
+                            <span id="orderShipping">0 ₽</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>К оплате</span>
+                            <span id="orderTotal">0 ₽</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>© 2025 Автозапчасти | <a href="#">Помощь</a> | <a href="#">О нас</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
