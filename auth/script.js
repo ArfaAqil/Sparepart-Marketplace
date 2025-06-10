@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const authForm = document.getElementById('authForm');
     const authTitle = document.querySelector('.auth-title');
 
-    // Load users data from users.json and localStorage
+    // Load users data from users.json and localStorage.
     let users = [];
     async function loadUsers() {
         try {
